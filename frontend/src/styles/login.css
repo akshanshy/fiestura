@@ -1,0 +1,93 @@
+/* Login Page */
+body.page-login *{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+body.page-login .login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #0a0a1f, #30304a);
+}
+
+body.page-login .login-card {
+  background: #fff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  text-align: center;
+  width: 350px;
+}
+
+body.page-login .login-card h2 {
+  margin-bottom: 10px;
+  color: #0a0a1f;
+}
+
+body.page-login .login-card p {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+body.page-login .login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+body.page-login .login-form .input-group {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  background: #f9f9f9;
+}
+
+body.page-login .login-form .input-group i {
+  color: #666;
+  margin-right: 10px;
+}
+
+body.page-login .login-form .input-group input {
+  border: none;
+  outline: none;
+  background: transparent;
+  flex: 1;
+  font-size: 1rem;
+}
+
+body.page-login .login-btn {
+  background: #0a0a1f;
+  color: #fff;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+body.page-login .login-btn:hover {
+  background: #20205c;
+}
+
+body.page-login .redirect-text {
+  margin-top: 15px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+body.page-login .redirect-text a {
+  color: #0a0a1f;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+body.page-login .redirect-text a:hover {
+  text-decoration: underline;
+}
+
