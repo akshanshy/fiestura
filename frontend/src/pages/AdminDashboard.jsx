@@ -26,7 +26,7 @@ export default function AdminDashboard() {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/events");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/events`);
       setEvents(res.data);
     } catch (err) {
       console.log(err);
@@ -37,7 +37,7 @@ export default function AdminDashboard() {
 
   // 🔄 Fetch registrations
   const fetchRegistrations = async () => {
-    const res = await axios.get("http://localhost:5000/registrations");
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/registrations`);
     setRegistrations(res.data);
   };
 
@@ -68,12 +68,12 @@ export default function AdminDashboard() {
     e.preventDefault();
 
     if (editId) {
-      await axios.put(`http://localhost:5000/events/${editId}`, form, {
+      await axios.put(`${import.meta.env.VITE_API_URL}/events/${editId}`, form, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEditId(null);
     } else {
-      await axios.post("http://localhost:5000/events", form, {
+      await axios.post(`${import.meta.env.VITE_API_URL}/events`, form, {
         headers: { Authorization: `Bearer ${token}` }
       });
     }
@@ -84,7 +84,7 @@ export default function AdminDashboard() {
 
   // ❌ Delete
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:5000/events/${id}`, {
+    await axios.delete(`${import.meta.env.VITE_API_URL}/events/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     fetchEvents();

@@ -8,13 +8,13 @@ export default function MyRegistrations() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/registrations/user/${user._id}`)
+      .get(`${import.meta.env.VITE_API_URL}/registrations/user/${user._id}`)
       .then(res => setRegs(res.data));
   }, []);
 
   const cancelRegistration = async (eventId) => {
     try {
-      await axios.delete("http://localhost:5000/registrations", {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/registrations`, {
         data: {
           userId: user._id,
           eventId

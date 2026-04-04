@@ -14,7 +14,7 @@ export default function Admin() {
   // 🔥 Fetch events
   const fetchEvents = () => {
     axios
-      .get("http://localhost:5000/events")
+      .get(`${import.meta.env.VITE_API_URL}/events`)
       .then((res) => setEvents(res.data));
   };
 
@@ -32,7 +32,7 @@ export default function Admin() {
     e.preventDefault();
 
     try {
-      await axios.post("http://localhost:5000/events", form);
+      await axios.post(`${import.meta.env.VITE_API_URL}/events`, form);
       alert("Event added ✅");
 
       fetchEvents(); // 🔥 refresh list
@@ -50,7 +50,7 @@ export default function Admin() {
 
   // ❌ Delete event
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:5000/events/${id}`);
+    await axios.delete(`${import.meta.env.VITE_API_URL}/events/${id}`);
     fetchEvents(); // refresh
   };
 

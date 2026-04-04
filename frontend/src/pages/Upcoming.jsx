@@ -8,7 +8,7 @@ export default function Upcoming() {
 
   useEffect(() => {
     axios
-      .get('http://localhost:5000/events?category=upcoming')
+      .get(`${import.meta.env.VITE_API_URL}/events?category=upcoming`)
       .then((res) => setEvents(res.data))
       .catch((err) => console.log(err))
   }, [])

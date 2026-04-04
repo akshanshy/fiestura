@@ -18,7 +18,7 @@ export default function AdminAddEvent() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await axios.post("http://localhost:5000/events", event);
+    await axios.post(`${import.meta.env.VITE_API_URL}/events`, event);
 
     alert("Event Added ✅");
   };

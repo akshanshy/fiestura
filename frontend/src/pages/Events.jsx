@@ -5,7 +5,7 @@ export default function Events() {
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/events")
+    axios.get(`${import.meta.env.VITE_API_URL}/events`)
       .then(res => setEvents(res.data));
   }, []);
 

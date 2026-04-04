@@ -20,7 +20,7 @@ export default function Ongoing() {
 
   useEffect(() => {
     axios
-      .get('http://localhost:5000/events?category=ongoing')
+      .get(`${import.meta.env.VITE_API_URL}/events?category=ongoing`)
       .then((res) => setEvents(res.data))
       .catch((err) => console.log(err))
   }, [])

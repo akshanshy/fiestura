@@ -8,7 +8,7 @@ export default function EventCard({ event }) {
   if (!user) return;
 
   axios
-    .get(`http://localhost:5000/registrations/user/${user._id}`)
+    .get(`${import.meta.env.VITE_API_URL}/registrations/user/${user._id}`)
     .then((res) => {
       const already = res.data.some(
         (r) => r.eventId === event._id
@@ -21,7 +21,7 @@ export default function EventCard({ event }) {
   const user = JSON.parse(localStorage.getItem("user"));
 
   try {
-    await axios.delete("http://localhost:5000/registrations", {
+    await axios.delete(`${import.meta.env.VITE_API_URL}/registrations`, {
       data: {
         userId: user._id,
         eventId: event._id
@@ -45,7 +45,7 @@ export default function EventCard({ event }) {
     }
 
     try {
-      await axios.post("http://localhost:5000/registrations", {
+      await axios.post(`${import.meta.env.VITE_API_URL}/registrations`, {
         userId: user._id,
         eventId: event._id,
         name: user.name,
