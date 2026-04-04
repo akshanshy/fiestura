@@ -14,8 +14,9 @@ const app = express();
 // 🔥 CORS MUST BE FIRST
 app.use(cors({
   origin: [
-    "http://localhost:5173", // for local dev
-    "https://fiestura.vercel.app" // your deployed frontend
+    "http://localhost:5173",
+    "https://fiestura.vercel.app",
+    "https://fiestura-45xwf080z-infine.vercel.app"
   ],
   credentials: true
 }));

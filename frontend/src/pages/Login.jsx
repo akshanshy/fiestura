@@ -10,27 +10,27 @@ export default function Login() {
   const [password, setPassword] = useState('')
 
 
-const handleLogin = async (e) => {
-  e.preventDefault();
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
-  try {
-    const res = await axios.post(
-      `${import.meta.env.VITE_API_URL}/auth/login`,
-      { email, password }
-    );
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/auth/login`,
+        { email, password }
+      );
 
-    localStorage.setItem("user", JSON.stringify(res.data.user));
-    localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      localStorage.setItem("token", res.data.token);
 
-    alert('Login successful 🎉');
+      alert('Login successful 🎉');
 
-    // ✅ ALWAYS go to home
-    window.location.href = "/";
+      // ✅ ALWAYS go to home
+      window.location.href = "/";
 
-  } catch (err) {
-    console.error(err);
-    alert(err.response?.data || 'Login failed');
-  }
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data || 'Login failed');
+    }
   };
 
   return (
