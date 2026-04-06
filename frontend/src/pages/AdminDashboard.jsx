@@ -14,7 +14,8 @@ export default function AdminDashboard() {
     title: "",
     description: "",
     date: "",
-    category: ""
+    category: "",
+    price: ""
   });
 
   const [editId, setEditId] = useState(null);
@@ -78,7 +79,7 @@ export default function AdminDashboard() {
       });
     }
 
-    setForm({ title: "", description: "", date: "", category: "" });
+    setForm({ title: "", description: "", date: "", category: "", price: "" });
     fetchEvents();
   };
 
@@ -96,7 +97,8 @@ export default function AdminDashboard() {
       title: event.title,
       description: event.description,
       date: event.date?.split("T")[0],
-      category: event.category
+      category: event.category,
+      price: event.price || ""
     });
     setEditId(event._id);
   };
@@ -157,6 +159,14 @@ export default function AdminDashboard() {
             <option value="ongoing">Ongoing</option>
             <option value="upcoming">Upcoming</option>
           </select>
+          <input
+            name="price"
+            type="number"
+            min="0"
+            value={form.price}
+            onChange={handleChange}
+            placeholder="Price in ₹ (0 = Free)"
+          />
           <div className="form-actions">
             <button type="submit">
               {editId ? "✏️ Update Event" : "➕ Add Event"}
@@ -164,7 +174,7 @@ export default function AdminDashboard() {
             {editId && (
               <button type="button" onClick={() => {
                 setEditId(null);
-                setForm({ title: "", description: "", date: "", category: "" });
+                setForm({ title: "", description: "", date: "", category: "", price: "" });
               }}>
                 ❌ Cancel
               </button>
@@ -193,6 +203,7 @@ export default function AdminDashboard() {
                 <div className="event-meta">
                   <span className="date">{new Date(event.date).toLocaleDateString()}</span>
                   <span className="category">{event.category}</span>
+                  <span className="price">{event.price > 0 ? `₹${event.price}` : "Free"}</span>
                 </div>
                 <p>{event.description}</p>
                 <div className="card-actions">

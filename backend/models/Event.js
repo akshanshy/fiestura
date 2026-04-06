@@ -33,6 +33,12 @@ const eventSchema = new mongoose.Schema(
     image: {
       type: String,
       default: ""
+    },
+
+    price: {
+      type: Number,
+      default: 0, // 0 = free event
+      min: 0
     }
   },
   { timestamps: true }

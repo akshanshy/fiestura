@@ -9,7 +9,7 @@ const router = express.Router();
 // ➕ CREATE EVENT
 router.post("/", verifyToken, verifyAdmin, async (req, res) =>{
   try {
-    const { title, description, date, category } = req.body;
+    const { title, description, date, category, price } = req.body;
 
     // validation
     if (!title || !description || !date || !category) {
@@ -21,6 +21,7 @@ router.post("/", verifyToken, verifyAdmin, async (req, res) =>{
       description,
       date,
       category,
+      price: price || 0,
     });
 
     res.status(201).json(event); // 201 = created
@@ -65,11 +66,11 @@ router.get("/:id", async (req, res) => {
 // ✏️ UPDATE EVENT
 router.put("/:id",verifyToken,verifyAdmin, async (req, res) => {
   try {
-    const { title, description, date, category } = req.body;
+    const { title, description, date, category, price } = req.body;
 
     const updated = await Event.findByIdAndUpdate(
       req.params.id,
-      { title, description, date, category },
+      { title, description, date, category, price: price || 0 },
       { new: true, runValidators: true }
     );
 

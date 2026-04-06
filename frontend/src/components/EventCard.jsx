@@ -1,42 +1,61 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
+import useRazorpay from "../hooks/useRazorpay";
+
 export default function EventCard({ event }) {
+  const [isRegistered, setIsRegistered] = useState(false);
+  const { pay, loading } = useRazorpay();
 
-    const [isRegistered, setIsRegistered] = useState(false);
-    useEffect(() => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  if (!user) return;
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) return;
 
-  axios
-    .get(`${import.meta.env.VITE_API_URL}/registrations/user/${user._id}`)
-    .then((res) => {
-      const already = res.data.some(
-        (r) => r.eventId === event._id
-      );
-      setIsRegistered(already);
-    });
-}, [event._id]);
+    axios
+      .get(`${import.meta.env.VITE_API_URL}/registrations/user/${user._id}`)
+      .then((res) => {
+        const already = res.data.some((r) => r.eventId === event._id);
+        setIsRegistered(already);
+      });
+  }, [event._id]);
 
-    const cancelRegistration = async () => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const cancelRegistration = async () => {
+    const user = JSON.parse(localStorage.getItem("user"));
 
-  try {
-    await axios.delete(`${import.meta.env.VITE_API_URL}/registrations`, {
-      data: {
+    try {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/registrations`, {
+        data: {
+          userId: user._id,
+          eventId: event._id,
+        },
+      });
+
+      alert("Registration cancelled ❌");
+      setIsRegistered(false);
+    } catch (err) {
+      alert(err.response?.data || "Error");
+    }
+  };
+
+  // Register the user (called after payment or directly for free events)
+  const registerUser = async () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    try {
+      await axios.post(`${import.meta.env.VITE_API_URL}/registrations`, {
         userId: user._id,
-        eventId: event._id
-      }
-    });
+        eventId: event._id,
+        name: user.name,
+        email: user.email,
+      });
 
-    alert("Registration cancelled ❌");
-    setIsRegistered(false);
+      alert("Registered successfully 🎉");
+      setIsRegistered(true);
+    } catch (err) {
+      alert(err.response?.data || "Error");
+    }
+  };
 
-  } catch (err) {
-    alert(err.response?.data || "Error");
-  }
-};
-
-  const register = async () => {
+  const handleRegister = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
 
     if (!user) {
@@ -44,18 +63,28 @@ export default function EventCard({ event }) {
       return;
     }
 
-    try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/registrations`, {
-        userId: user._id,
-        eventId: event._id,
-        name: user.name,
-        email: user.email
-      });
+    const price = event.price || 0;
 
-      alert("Registered successfully 🎉");
-    } catch (err) {
-      alert(err.response?.data || "Error");
+    // ── Free event → register directly ──
+    if (price === 0) {
+      await registerUser();
+      return;
     }
+
+    // ── Paid event → Razorpay → then register ──
+    pay({
+      amount: price,
+      userId: user._id,
+      eventId: event._id,
+      userName: user.name,
+      userEmail: user.email,
+      onSuccess: async () => {
+        await registerUser();
+      },
+      onFailure: (msg) => {
+        alert(`Payment failed: ${msg}`);
+      },
+    });
   };
 
   return (
@@ -65,18 +94,27 @@ export default function EventCard({ event }) {
       <p>{new Date(event.date).toDateString()}</p>
       <p>{event.category}</p>
 
-     {isRegistered ? (
-  <button
-    onClick={cancelRegistration}
-    style={{ background: "red", color: "white" }}
-  >
-    ❌ Cancel Registration
-  </button>
-) : (
-  <button onClick={register}>
-    Register
-  </button>
-)}
+      {/* Price badge */}
+      {event.price > 0 && (
+        <p className="price-badge">₹{event.price}</p>
+      )}
+
+      {isRegistered ? (
+        <button
+          onClick={cancelRegistration}
+          style={{ background: "red", color: "white" }}
+        >
+          ❌ Cancel Registration
+        </button>
+      ) : (
+        <button onClick={handleRegister} disabled={loading}>
+          {loading
+            ? "Processing..."
+            : event.price > 0
+              ? `Pay ₹${event.price} & Register`
+              : "Register"}
+        </button>
+      )}
     </div>
   );
 }

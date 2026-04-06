@@ -398,3 +398,29 @@ body.page-ongoing .events-grid > p::before {
   }
 }
 
+/* Price Badge */
+body.page-ongoing .event-card .price-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  padding: 0.5rem 1.2rem;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0.5rem 1.5rem;
+  width: fit-content;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+body.dark-mode.page-ongoing .event-card .price-badge {
+  background: linear-gradient(135deg, #34d399, #10b981);
+  box-shadow: 0 4px 15px rgba(52, 211, 153, 0.3);
+}
+
+/* Disabled / Processing Button */
+body.page-ongoing .event-card button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
