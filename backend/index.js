@@ -1,13 +1,15 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
-import dotenv from "dotenv";
-
+import paymentRoutes from "./routes/payment.js";
 import eventRoutes from "./routes/events.js";
 import authRoutes from "./routes/auth.js";
 import registrationRoutes from "./routes/registrations.js";
 
-dotenv.config();
+
+
 
 const app = express();
 
@@ -28,6 +30,7 @@ app.use(express.json());
 app.use("/events", eventRoutes);
 app.use("/auth", authRoutes);
 app.use("/registrations", registrationRoutes);
+app.use("/api/payment", paymentRoutes);
 
 // DB
 mongoose.connect(process.env.MONGO_URI)
