@@ -30,7 +30,7 @@ export default function Home() {
         </video>
         <div className="overlay"></div>
         <div className="hero-text">
-          <h1 className="animate-text">Welcome to Fiesturo</h1>
+          <h1 className="animate-text">Welcome to Fiestura</h1>
           <p className="animate-sub">Learn | Experience | Celebrate</p>
         </div>
       </div>
