@@ -63,4 +63,56 @@ router.post("/login", async (req, res) => {
   }
 });
 
+
+// 🔑 FORGOT PASSWORD
+router.post("/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json("User not found");
+    
+    const resetToken = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "15m" }
+    );
+    
+    user.resetpasswordToken = resetToken;
+    user.resetpasswordTokenExpiry = new Date(Date.now() + 15 * 60 * 1000);
+    await user.save();
+    
+    res.json({ message: "Reset token generated", resetToken });
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+});
+
+
+// 🔑 RESET PASSWORD
+router.post("/reset-password", async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    const user = await User.findOne({
+      _id: decoded.id,
+      resetpasswordToken: token,
+      resetpasswordTokenExpiry: { $gt: new Date() }
+    });
+    
+    if (!user) return res.status(400).json("Invalid or expired token");
+    
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.resetpasswordToken = undefined;
+    user.resetpasswordTokenExpiry = undefined;
+    await user.save();
+    
+    res.json({ message: "Password reset successful" });
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+});
+
 export default router;
