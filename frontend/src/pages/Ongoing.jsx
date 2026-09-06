@@ -19,10 +19,16 @@ export default function Ongoing() {
   const [events, setEvents] = useState([])
 
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_API_URL}/events?category=ongoing`)
-      .then((res) => setEvents(res.data))
-      .catch((err) => console.log(err))
+   axios
+  .get(`${import.meta.env.VITE_API_URL}/events`)
+  .then((res) => {
+    const ongoingEvents = res.data.filter(
+      (event) => event.status === "ongoing"
+    );
+
+    setEvents(ongoingEvents);
+  })
+  .catch((err) => console.log(err))
   }, [])
 
   function toggleFullscreen() {

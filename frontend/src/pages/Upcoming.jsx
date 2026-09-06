@@ -7,10 +7,16 @@ export default function Upcoming() {
   const [events, setEvents] = useState([])
 
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_API_URL}/events?category=upcoming`)
-      .then((res) => setEvents(res.data))
-      .catch((err) => console.log(err))
+      axios
+  .get(`${import.meta.env.VITE_API_URL}/events`)
+  .then((res) => {
+    const upcomingEvents = res.data.filter(
+      (event) => event.status === "upcoming"
+    );
+
+    setEvents(upcomingEvents);
+  })
+  .catch((err) => console.log(err))
   }, [])
 
   return (

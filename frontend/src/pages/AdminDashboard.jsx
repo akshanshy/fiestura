@@ -23,6 +23,21 @@ export default function AdminDashboard() {
   const token = localStorage.getItem("token");
   console.log("TOKEN:", token);
 
+  const formatDate = (date) => {
+  if (!date) return "Date not available";
+
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "Date not available";
+  }
+
+  return parsedDate.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
   // 🔄 Fetch events
   const fetchEvents = async () => {
     try {
@@ -67,6 +82,7 @@ export default function AdminDashboard() {
   // ➕ Add / Update
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Frontend event:", form);
 
     if (editId) {
       await axios.put(`${import.meta.env.VITE_API_URL}/events/${editId}`, form, {
@@ -121,7 +137,7 @@ export default function AdminDashboard() {
       {/* Stats Cards */}
       <div className="admin-stats">
         <div className="stat-card events">
-          <div className="stat-icon">🎪</div>
+          <div className="stat-icon"></div>
           <div className="stat-number">{events.length}</div>
           <div className="stat-label">Total Events</div>
         </div>
@@ -174,7 +190,6 @@ export default function AdminDashboard() {
             required
           >
             <option value="">Select Category</option>
-            <option value="">Select Category</option>
 <option value="Technical">Technical</option>
 <option value="Cultural">Cultural</option>
 <option value="Sports">Sports</option>
@@ -195,9 +210,9 @@ export default function AdminDashboard() {
             {editId && (
               <button type="button" onClick={() => {
                 setEditId(null);
-                setForm({ title: "", description: "", date: "", category: "", price: "" });
+                setForm({ title: "", description: "", startDate: "", endDate: "", category: "", price: "" });
               }}>
-                ❌ Cancel
+                Cancel
               </button>
             )}
           </div>
@@ -222,17 +237,19 @@ export default function AdminDashboard() {
               <div key={event._id} className="event-card">
                 <h3>{event.title}</h3>
                 <div className="event-meta">
-                  <span className="date">{new Date(event.date).toLocaleDateString()}</span>
+                  <span className="date">
+             {formatDate(event.startDate)} - {formatDate(event.endDate)}
+                 </span>
                   <span className="category">{event.category}</span>
                   <span className="price">{event.price > 0 ? `₹${event.price}` : "Free"}</span>
                 </div>
                 <p>{event.description}</p>
                 <div className="card-actions">
                   <button className="edit" onClick={() => handleEdit(event)}>
-                    ✏️ Edit
+                     Edit
                   </button>
                   <button className="delete" onClick={() => handleDelete(event._id)}>
-                    🗑️ Delete
+                     Delete
                   </button>
                 </div>
               </div>

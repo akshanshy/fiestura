@@ -5,6 +5,31 @@ import { verifyAdmin } from "../middleware/verifyAdmin.js";
 
 const router = express.Router();
 
+// 🔄 Calculate event status automatically
+function getEventStatus(startDate, endDate) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const start = new Date(startDate);
+  start.setHours(0, 0, 0, 0);
+
+  const end = new Date(endDate);
+  end.setHours(0, 0, 0, 0);
+
+  // Start ongoing one day before the event
+  const ongoingStart = new Date(start);
+  ongoingStart.setDate(ongoingStart.getDate() - 1);
+
+  if (today > end) {
+    return "past";
+  }
+
+  if (today >= ongoingStart && today <= end) {
+    return "ongoing";
+  }
+
+  return "upcoming";
+}
 
 // ➕ CREATE EVENT
 router.post("/", verifyToken, verifyAdmin, async (req, res) => {
@@ -62,7 +87,28 @@ router.get("/", async (req, res) => {
 
     const events = await Event.find(query).sort({ createdAt: -1 });
 
-    res.status(200).json(events);
+    // 🔄 Add automatic status to every event
+    const updatedEvents = events.map((event) => {
+  const status = getEventStatus(event.startDate, event.endDate);
+
+  console.log(
+    "Event:",
+    event.title,
+    "| Start:",
+    event.startDate,
+    "| End:",
+    event.endDate,
+    "| Status:",
+    status
+  );
+
+  return {
+    ...event.toObject(),
+    status
+  };
+});
+
+    res.status(200).json(updatedEvents);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -86,13 +132,46 @@ router.get("/:id", async (req, res) => {
 
 
 // ✏️ UPDATE EVENT
-router.put("/:id",verifyToken,verifyAdmin, async (req, res) => {
+// ✏️ UPDATE EVENT
+router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
-    const { title, description, startDate, endDate, category, price } = req.body;
+    const {
+      title,
+      description,
+      startDate,
+      endDate,
+      category,
+      location,
+      image,
+      price
+    } = req.body;
+
+    // validation
+    if (!title || !description || !startDate || !endDate || !category) {
+      return res.status(400).json({
+        message: "Title, description, start date, end date and category are required"
+      });
+    }
+
+    // Prevent invalid date range
+    if (new Date(endDate) < new Date(startDate)) {
+      return res.status(400).json({
+        message: "End date cannot be before start date"
+      });
+    }
 
     const updated = await Event.findByIdAndUpdate(
       req.params.id,
-      { title, description, date, category, price: price || 0 },
+      {
+        title,
+        description,
+        startDate,
+        endDate,
+        category,
+        location,
+        image,
+        price: price || 0
+      },
       { new: true, runValidators: true }
     );
 

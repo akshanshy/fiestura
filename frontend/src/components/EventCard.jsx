@@ -7,16 +7,22 @@ export default function EventCard({ event }) {
   const { pay, loading } = useRazorpay();
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (!user) return;
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (!user) return;
 
-    axios
-      .get(`${import.meta.env.VITE_API_URL}/registrations/user/${user._id}`)
-      .then((res) => {
-        const already = res.data.some((r) => r.eventId === event._id);
-        setIsRegistered(already);
-      });
-  }, [event._id]);
+  axios
+    .get(`${import.meta.env.VITE_API_URL}/registrations/user/${user._id}`)
+    .then((res) => {
+      const already = res.data.some(
+        (r) => String(r.eventId) === String(event._id)
+      );
+
+      setIsRegistered(already);
+    })
+    .catch((err) => {
+      console.error("Error checking registration:", err);
+    });
+}, [event._id]);
 
   const cancelRegistration = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -54,7 +60,21 @@ export default function EventCard({ event }) {
       alert(err.response?.data || "Error");
     }
   };
+  const formatDate = (date) => {
+  if (!date) return "Date not available";
 
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "Date not available";
+  }
+
+  return parsedDate.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
   const handleRegister = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
 
@@ -91,7 +111,7 @@ export default function EventCard({ event }) {
     <div className="event-card">
       <h3>{event.title}</h3>
       <p>{event.description}</p>
-      <p>{new Date(event.date).toDateString()}</p>
+      <p>{formatDate(event.startDate)} - {formatDate(event.endDate)}</p>
       <p>{event.category}</p>
 
       {/* Price badge */}
