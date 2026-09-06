@@ -5,7 +5,8 @@ export default function AdminAddEvent() {
   const [event, setEvent] = useState({
     title: "",
     description: "",
-    date: "",
+    startDate: "",
+    endDate: "",
     location: "",
     category: "",
     image: ""
@@ -26,10 +27,33 @@ export default function AdminAddEvent() {
   return (
     <form onSubmit={handleSubmit}>
       <input name="title" placeholder="Title" onChange={handleChange} />
-      <input name="description" placeholder="Description" onChange={handleChange} />
-      <input name="date" type="date" onChange={handleChange} />
+
+      <input
+        name="description"
+        placeholder="Description"
+        onChange={handleChange}
+      />
+
+      <label>Start Date</label>
+      <input
+        name="startDate"
+        type="date"
+        value={event.startDate}
+        onChange={handleChange}
+      />
+
+      <label>End Date</label>
+      <input
+        name="endDate"
+        type="date"
+        value={event.endDate}
+        onChange={handleChange}
+      />
+
       <input name="location" placeholder="Location" onChange={handleChange} />
+
       <input name="category" placeholder="Category" onChange={handleChange} />
+
       <input name="image" placeholder="Image URL" onChange={handleChange} />
 
       <button type="submit">Add Event</button>

@@ -7,24 +7,46 @@ const router = express.Router();
 
 
 // ➕ CREATE EVENT
-router.post("/", verifyToken, verifyAdmin, async (req, res) =>{
+router.post("/", verifyToken, verifyAdmin, async (req, res) => {
+  console.log("Received event:", req.body);
   try {
-    const { title, description, date, category, price } = req.body;
+    const {
+      title,
+      description,
+      startDate,
+      endDate,
+      category,
+      location,
+      image,
+      price
+    } = req.body;
 
     // validation
-    if (!title || !description || !date || !category) {
-      return res.status(400).json({ message: "All fields are required" });
+    if (!title || !description || !startDate || !endDate || !category) {
+      return res.status(400).json({
+        message: "Title, description, start date, end date and category are required"
+      });
+    }
+
+    // Prevent invalid date range
+    if (new Date(endDate) < new Date(startDate)) {
+      return res.status(400).json({
+        message: "End date cannot be before start date"
+      });
     }
 
     const event = await Event.create({
       title,
       description,
-      date,
+      startDate,
+      endDate,
       category,
-      price: price || 0,
+      location,
+      image,
+      price: price || 0
     });
 
-    res.status(201).json(event); // 201 = created
+    res.status(201).json(event);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -66,7 +88,7 @@ router.get("/:id", async (req, res) => {
 // ✏️ UPDATE EVENT
 router.put("/:id",verifyToken,verifyAdmin, async (req, res) => {
   try {
-    const { title, description, date, category, price } = req.body;
+    const { title, description, startDate, endDate, category, price } = req.body;
 
     const updated = await Event.findByIdAndUpdate(
       req.params.id,

@@ -13,15 +13,18 @@ const eventSchema = new mongoose.Schema(
       required: true
     },
 
-    date: {
+    startDate: {
       type: Date,
       required: true
     },
-
+    endDate: {
+      type: Date,
+      required: true
+    },
     category: {
       type: String,
       required: true,
-      enum: ["ongoing", "upcoming", "past"] // optional but good
+     // enum: ["ongoing", "upcoming", "past"] // optional but good
     },
 
     // Optional fields (for future upgrade 🚀)

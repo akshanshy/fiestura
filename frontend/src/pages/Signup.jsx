@@ -21,7 +21,7 @@ export default function Signup() {
     e.preventDefault()
 
     if (form.password !== form.confirmPassword) {
-      return alert("Passwords do not match ❌")
+      return alert("Passwords do not match ")
     }
 
     try {

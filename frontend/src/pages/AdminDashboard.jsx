@@ -11,13 +11,13 @@ export default function AdminDashboard() {
   const [eventFilter, setEventFilter] = useState("");
 
   const [form, setForm] = useState({
-    title: "",
-    description: "",
-    date: "",
-    category: "",
-    price: ""
-  });
-
+  title: "",
+  description: "",
+  startDate: "",
+  endDate: "",
+  category: "",
+  price: ""
+});
   const [editId, setEditId] = useState(null);
 
   const token = localStorage.getItem("token");
@@ -79,7 +79,14 @@ export default function AdminDashboard() {
       });
     }
 
-    setForm({ title: "", description: "", date: "", category: "", price: "" });
+    setForm({
+  title: "",
+  description: "",
+  startDate: "",
+  endDate: "",
+  category: "",
+  price: ""
+});
     fetchEvents();
   };
 
@@ -96,7 +103,8 @@ export default function AdminDashboard() {
     setForm({
       title: event.title,
       description: event.description,
-      date: event.date?.split("T")[0],
+      startDate: event.startDate?.split("T")[0],
+       endDate: event.endDate?.split("T")[0],
       category: event.category,
       price: event.price || ""
     });
@@ -142,13 +150,23 @@ export default function AdminDashboard() {
             placeholder="Event Description"
             required
           />
-          <input
-            name="date"
-            type="date"
-            value={form.date}
-            onChange={handleChange}
-            required
-          />
+          <label>Start Date</label>
+<input
+  name="startDate"
+  type="date"
+  value={form.startDate}
+  onChange={handleChange}
+  required
+/>
+
+<label>End Date</label>
+<input
+  name="endDate"
+  type="date"
+  value={form.endDate}
+  onChange={handleChange}
+  required
+/>
           <select
             name="category"
             value={form.category}
@@ -156,8 +174,11 @@ export default function AdminDashboard() {
             required
           >
             <option value="">Select Category</option>
-            <option value="ongoing">Ongoing</option>
-            <option value="upcoming">Upcoming</option>
+            <option value="">Select Category</option>
+<option value="Technical">Technical</option>
+<option value="Cultural">Cultural</option>
+<option value="Sports">Sports</option>
+<option value="Workshop">Workshop</option>
           </select>
           <input
             name="price"
