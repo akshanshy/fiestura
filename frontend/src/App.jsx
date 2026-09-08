@@ -11,6 +11,7 @@ import Upcoming from './pages/Upcoming.jsx'
 import Past from './pages/Past.jsx'
 import AdminDashboard from "./pages/AdminDashboard";
 import MyRegistrations from "./pages/MyRegistrations.jsx";
+import EventDetails from "./pages/EventDetails";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -68,6 +69,7 @@ function AppRoutes({ user }) {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/my-registrations" element={<MyRegistrations />} />
+      <Route path="/events/:id" element={<EventDetails />} />
 
       {/* 🔐 ADMIN ROUTE */}
       <Route

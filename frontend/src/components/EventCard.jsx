@@ -1,10 +1,11 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import useRazorpay from "../hooks/useRazorpay";
-
+import { useNavigate } from "react-router-dom";
 export default function EventCard({ event }) {
   const [isRegistered, setIsRegistered] = useState(false);
   const { pay, loading } = useRazorpay();
+  const navigate = useNavigate();
 
   useEffect(() => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -80,6 +81,7 @@ export default function EventCard({ event }) {
 
     if (!user) {
       alert("Please login first");
+      navigate("/login");
       return;
     }
 
@@ -135,6 +137,11 @@ export default function EventCard({ event }) {
               : "Register"}
         </button>
       )}
+      <button
+      onClick={() => navigate(`/events/${event._id}`)}
+      >
+    View Details
+   </button>
     </div>
   );
 }
