@@ -22,13 +22,13 @@ const userSchema = new mongoose.Schema({
     enum: ["user", "admin"], // 🔥 restrict values
     default: "user",
   },
-  resetpasswordToken: {
+  resetPasswordToken: {
     type: String,
-    default: "",
+    default: null,
   },
-  resetpasswordTokenExpiry: {
+  resetPasswordExpires: {
     type: Date,
-    default: Date.now(),
+    default: null,
   },
 });
 
