@@ -9,39 +9,37 @@ export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-
   const handleLogin = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/auth/login`,
         { email, password }
-      );
+      )
 
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user))
+      localStorage.setItem("token", res.data.token)
 
-      alert('Login successful 🎉');
+      alert('Login successful')
 
-      // ✅ ALWAYS go to home
-      window.location.href = "/";
-
+      window.location.href = "/"
     } catch (err) {
-      console.error(err);
-      alert(err.response?.data || 'Login failed');
+      console.error(err)
+      alert(err.response?.data?.message || 'Login failed')
     }
-  };
+  }
 
   return (
     <div className="login-container">
       <div className="login-card">
         <h2>Welcome Back</h2>
-        <p>Login to continue exploring Eventura</p>
+        <p>Login to continue exploring Fiestura</p>
 
         <form className="login-form" onSubmit={handleLogin}>
           <div className="input-group">
             <i className="fa-solid fa-envelope"></i>
+
             <input
               type="email"
               placeholder="Email Address"
@@ -53,6 +51,7 @@ export default function Login() {
 
           <div className="input-group">
             <i className="fa-solid fa-lock"></i>
+
             <input
               type="password"
               placeholder="Password"
@@ -60,6 +59,12 @@ export default function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+          </div>
+
+          <div className="forgot-password-wrapper">
+            <Link to="/forgot-password" className="forgot-password-link">
+              Forgot Password?
+            </Link>
           </div>
 
           <button type="submit" className="login-btn">

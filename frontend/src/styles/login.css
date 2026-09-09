@@ -91,3 +91,19 @@ body.page-login .redirect-text a:hover {
   text-decoration: underline;
 }
 
+.forgot-password-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -8px;
+  margin-bottom: 15px;
+}
+
+.forgot-password-link {
+  color: #6c63ff;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline;
+}

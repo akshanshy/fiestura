@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 
+import ForgotPassword from './pages/ForgotPassword.jsx'
 import Home from './pages/Home.jsx'
 import Contact from './pages/Contact.jsx'
 import Login from './pages/Login.jsx'
@@ -68,6 +69,7 @@ function AppRoutes({ user }) {
       <Route path="/contact" element={<Contact />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/my-registrations" element={<MyRegistrations />} />
       <Route path="/events/:id" element={<EventDetails />} />
 
