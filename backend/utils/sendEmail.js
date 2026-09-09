@@ -7,9 +7,10 @@ console.log("SMTP_USER:", process.env.SMTP_USER);
 console.log("SMTP_PASS exists:", Boolean(process.env.SMTP_PASS));
 
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: false,
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  family: 4, // Use IPv4
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
