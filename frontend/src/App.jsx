@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "r
 import { useEffect } from "react";
 
 import ResetPassword from "./pages/ResetPassword";
-import ForgotPassword from './pages/ForgotPassword.jsx'
+import ForgotPassword from './pages/forgotpassword.jsx'
 import Home from './pages/Home.jsx'
 import Contact from './pages/Contact.jsx'
 import Login from './pages/Login.jsx'
