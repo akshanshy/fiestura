@@ -6,7 +6,7 @@ export default function Events() {
 
   useEffect(() => {
     axios.get(`${import.meta.env.VITE_API_URL}/events`)
-      .then(res => setEvents(res.data));
+      .then(res => setEvents(res.data.events));
   }, []);
 
   return (

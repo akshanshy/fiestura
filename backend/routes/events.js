@@ -83,34 +83,52 @@ router.get("/", async (req, res) => {
   try {
     const { category } = req.query;
 
+    // Pagination values
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const limit = Math.min(parseInt(req.query.limit) || 20, 50);
+
+    // Calculate how many documents to skip
+    const skip = (page - 1) * limit;
+
+    // Filter
     const query = category ? { category } : {};
 
-    const events = await Event.find(query).sort({ createdAt: -1 });
+    // Get events
+    const events = await Event.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
-    // 🔄 Add automatic status to every event
+    // Calculate status
     const updatedEvents = events.map((event) => {
-  const status = getEventStatus(event.startDate, event.endDate);
+      const status = getEventStatus(
+        event.startDate,
+        event.endDate
+      );
 
-  console.log(
-    "Event:",
-    event.title,
-    "| Start:",
-    event.startDate,
-    "| End:",
-    event.endDate,
-    "| Status:",
-    status
-  );
+      return {
+        ...event.toObject(),
+        status
+      };
+    });
 
-  return {
-    ...event.toObject(),
-    status
-  };
-});
+    // Total matching events
+    const totalEvents = await Event.countDocuments(query);
 
-    res.status(200).json(updatedEvents);
+    res.status(200).json({
+      events: updatedEvents,
+      pagination: {
+        page,
+        limit,
+        totalEvents,
+        totalPages: Math.ceil(totalEvents / limit)
+      }
+    });
+
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      message: err.message
+    });
   }
 });
 
@@ -142,8 +160,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-
-// ✏️ UPDATE EVENT
 // ✏️ UPDATE EVENT
 router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
