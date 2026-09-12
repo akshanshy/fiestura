@@ -1,10 +1,10 @@
 Fiestura is a full-stack event management platform where users can explore events, register, and make payments, while admins can manage events and users efficiently.
-🚀 Features
-👤 User Features
+Features
+User Features
 Browse all events
 Filter events by category (ongoing/upcoming)
 Register for events
-Secure login/signup (JWT आधारित authentication)
+Secure login/signup (JWT authentication)
 View registered events in dashboard
 🧑‍💼 Admin Features
 Create, update, delete events
