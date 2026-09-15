@@ -1,5 +1,8 @@
 import dotenv from "dotenv";
 dotenv.config();
+console.log("Redis URL loaded:", Boolean(process.env.REDIS_URL));
+import redisClient from "./config/redis.js";
+
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
@@ -35,6 +38,11 @@ app.use("/api/payment", paymentRoutes);
 // DB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected ✅"))
+  .catch(err => console.log(err));
+
+
+ redisClient.connect()
+  .then(() => console.log("Redis connected ✅"))
   .catch(err => console.log(err));
 
 // test

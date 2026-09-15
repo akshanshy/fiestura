@@ -42,6 +42,17 @@ const eventSchema = new mongoose.Schema(
       type: Number,
       default: 0, // 0 = free event
       min: 0
+    },
+    capacity: {
+      type: Number,
+      required: true,
+      min: 1
+    },
+
+    registeredCount: {
+      type: Number,
+      default: 0,
+      min: 0
     }
   },
   { timestamps: true }

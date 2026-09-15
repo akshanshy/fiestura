@@ -1,10 +1,24 @@
 import express from "express";
 import Event from "../models/Event.js";
+import redisClient from "../config/redis.js";
 import { verifyToken } from "../middleware/verifyToken.js";
 import { verifyAdmin } from "../middleware/verifyAdmin.js";
 
 const router = express.Router();
+const clearEventCache = async () => {
+  try {
+    for await (const key of redisClient.scanIterator({
+      MATCH: "events:*",
+      COUNT: 100
+    })) {
+      await redisClient.del(key);
+    }
 
+    console.log("Event cache cleared");
+  } catch (err) {
+    console.error("Error clearing event cache:", err);
+  }
+};
 // 🔄 Calculate event status automatically
 function getEventStatus(startDate, endDate) {
   const today = new Date();
@@ -70,7 +84,7 @@ router.post("/", verifyToken, verifyAdmin, async (req, res) => {
       image,
       price: price || 0
     });
-
+    await clearEventCache();
     res.status(201).json(event);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -83,23 +97,33 @@ router.get("/", async (req, res) => {
   try {
     const { category } = req.query;
 
-    // Pagination values
     const page = Math.max(parseInt(req.query.page) || 1, 1);
     const limit = Math.min(parseInt(req.query.limit) || 20, 50);
 
-    // Calculate how many documents to skip
     const skip = (page - 1) * limit;
 
-    // Filter
     const query = category ? { category } : {};
 
-    // Get events
+    // Create a unique Redis key for this query
+    const cacheKey = `events:${category || "all"}:page:${page}:limit:${limit}`;
+
+    // 1. Check Redis
+    const cachedEvents = await redisClient.get(cacheKey);
+
+    if (cachedEvents) {
+      console.log("Redis cache HIT:", cacheKey);
+
+      return res.status(200).json(JSON.parse(cachedEvents));
+    }
+
+    console.log("Redis cache MISS:", cacheKey);
+
+    // 2. Redis doesn't have the data → MongoDB
     const events = await Event.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
-    // Calculate status
     const updatedEvents = events.map((event) => {
       const status = getEventStatus(
         event.startDate,
@@ -112,10 +136,9 @@ router.get("/", async (req, res) => {
       };
     });
 
-    // Total matching events
     const totalEvents = await Event.countDocuments(query);
 
-    res.status(200).json({
+    const responseData = {
       events: updatedEvents,
       pagination: {
         page,
@@ -123,7 +146,18 @@ router.get("/", async (req, res) => {
         totalEvents,
         totalPages: Math.ceil(totalEvents / limit)
       }
-    });
+    };
+
+    // 3. Store MongoDB result in Redis
+    await redisClient.set(
+      cacheKey,
+      JSON.stringify(responseData)
+    );
+
+    console.log("Data stored in Redis:", cacheKey);
+
+    // 4. Return response
+    res.status(200).json(responseData);
 
   } catch (err) {
     res.status(500).json({
@@ -132,7 +166,13 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/clear-cache", async (req, res) => {
+  await clearEventCache();
 
+  res.json({
+    message: "Cache cleared"
+  });
+});
 // 📄 GET SINGLE EVENT (IMPORTANT for details page)
 router.get("/:id", async (req, res) => {
   try {
@@ -206,7 +246,7 @@ router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
     if (!updated) {
       return res.status(404).json({ message: "Event not found" });
     }
-
+await clearEventCache();
     res.status(200).json(updated);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -222,7 +262,7 @@ router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
     if (!deleted) {
       return res.status(404).json({ message: "Event not found" });
     }
-
+await clearEventCache();
     res.status(200).json({ message: "Event deleted successfully ✅" });
   } catch (err) {
     res.status(500).json({ message: err.message });
