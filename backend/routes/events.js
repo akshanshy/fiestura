@@ -111,13 +111,16 @@ router.get("/", async (req, res) => {
     const cachedEvents = await redisClient.get(cacheKey);
 
     if (cachedEvents) {
-      console.log("Redis cache HIT:", cacheKey);
+  console.log("Redis cache HIT:", cacheKey);
+  //await redisClient.del(cacheKey);
+  const ttl = await redisClient.ttl(cacheKey);
+  console.log("TTL remaining:", ttl);
 
-      return res.status(200).json(JSON.parse(cachedEvents));
-    }
+  return res.status(200).json(JSON.parse(cachedEvents));
+}
 
     console.log("Redis cache MISS:", cacheKey);
-
+      
     // 2. Redis doesn't have the data → MongoDB
     const events = await Event.find(query)
       .sort({ createdAt: -1 })
@@ -151,10 +154,15 @@ router.get("/", async (req, res) => {
     // 3. Store MongoDB result in Redis
     await redisClient.set(
       cacheKey,
-      JSON.stringify(responseData)
+      JSON.stringify(responseData),
+       {
+       EX: 60
+      }
+      
     );
-
-    console.log("Data stored in Redis:", cacheKey);
+    const ttl = await redisClient.ttl(cacheKey);
+     //console.log("TTL:", ttl);
+    //console.log("Data stored in Redis:", cacheKey);
 
     // 4. Return response
     res.status(200).json(responseData);
