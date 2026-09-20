@@ -28,7 +28,7 @@ router.post("/", async (req, res) => {
       });
     }
 
-    // 2. Atomically reserve a seat
+    // 2. reserve a seat
     const event = await Event.findOneAndUpdate(
       {
         _id: eventId,
@@ -95,7 +95,7 @@ router.post("/", async (req, res) => {
 });
 
 
-// 👤 User registrations
+//  User registrations
 router.get("/user/:userId", async (req, res) => {
   try {
     const registrations = await Registration.aggregate([
