@@ -1,0 +1,15 @@
+services:
+
+  backend:
+    build: .
+    container_name: fiestura-backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:latest
+    container_name: fiestura-redis
