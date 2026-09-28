@@ -26,8 +26,14 @@ app.use(cors({
   credentials: true
 }));
 
-// 🔥 THEN JSON
-app.use(express.json());
+// 🔥 THEN JSON (with rawBody capture for webhook signature verification)
+app.use(
+  express.json({
+    verify: (req, res, buf) => {
+      req.rawBody = buf;
+    },
+  })
+);
 
 // 🔥 ROUTES AFTER
 app.use("/events", eventRoutes);

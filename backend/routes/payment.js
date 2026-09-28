@@ -4,6 +4,7 @@ import {
   verifyPayment,
   getPaymentStatus,
   getUserPayments,
+  handleWebhook,
 } from "../controllers/paymentController.js";
 
 const router = express.Router();
@@ -13,6 +14,9 @@ router.post("/create-order", createOrder);
 
 // POST  /api/payment/verify         → Verify payment signature
 router.post("/verify", verifyPayment);
+
+// POST  /api/payment/webhook        → Razorpay webhook handler
+router.post("/webhook", handleWebhook);
 
 // GET   /api/payment/status/:orderId → Check payment status
 router.get("/status/:orderId", getPaymentStatus);

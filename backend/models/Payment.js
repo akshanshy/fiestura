@@ -49,6 +49,14 @@ const paymentSchema = new mongoose.Schema(
     receipt: {
       type: String,
     },
+
+    // Idempotency Key to prevent duplicate payment order creation
+    idempotencyKey: {
+      type: String,
+      unique: true,
+      sparse: true,
+      index: true,
+    },
   },
   { timestamps: true }
 );

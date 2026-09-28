@@ -3,12 +3,23 @@ import axios from "axios";
 
 const API = import.meta.env.VITE_API_URL;
 
+const generateUUID = () => {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
+
 /**
  * useRazorpay — Custom hook for Razorpay payment flow
  *
  * Usage:
  *   const { pay, loading } = useRazorpay();
- *   await pay({ amount, userId, eventId, userName, userEmail, onSuccess, onFailure });
+ *   await pay({ amount, userId, eventId, userName, userEmail, idempotencyKey, onSuccess, onFailure });
  */
 export default function useRazorpay() {
   const [loading, setLoading] = useState(false);
@@ -19,18 +30,30 @@ export default function useRazorpay() {
     eventId,
     userName,
     userEmail,
+    idempotencyKey,
     onSuccess,
     onFailure,
   }) => {
     setLoading(true);
 
     try {
-      // 1️⃣ Create order on backend
-      const { data } = await axios.post(`${API}/api/payment/create-order`, {
-        amount,
-        userId,
-        eventId,
-      });
+      const activeIdempotencyKey = idempotencyKey || generateUUID();
+
+      // 1️⃣ Create order on backend (passing idempotency key in header & body)
+      const { data } = await axios.post(
+        `${API}/api/payment/create-order`,
+        {
+          amount,
+          userId,
+          eventId,
+          idempotencyKey: activeIdempotencyKey,
+        },
+        {
+          headers: {
+            "x-idempotency-key": activeIdempotencyKey,
+          },
+        }
+      );
 
       if (!data.success) {
         throw new Error(data.message || "Could not create order");
