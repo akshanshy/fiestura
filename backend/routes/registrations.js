@@ -2,6 +2,8 @@ import express from "express";
 import Registration from "../models/Registration.js";
 import Event from "../models/Event.js";
 import mongoose from "mongoose";
+import { verifyToken } from "../middleware/verifyToken.js";
+import { verifyAdmin } from "../middleware/verifyAdmin.js";
 const router = express.Router();
 
 
@@ -131,12 +133,14 @@ router.get("/user/:userId", async (req, res) => {
 
 
 // 🧑‍💼 Admin: registrations with server-side pagination & optional eventId filter
-router.get("/", async (req, res) => {
+router.get("/", verifyToken, verifyAdmin, async (req, res) => {
   try {
-    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
-    let limit = parseInt(req.query.limit, 10) || 20;
-    if (isNaN(limit) || limit < 1) limit = 20;
-    if (limit > 50) limit = 50;
+    const requestedPage = Number.parseInt(req.query.page, 10);
+    const page = Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+    const requestedLimit = Number.parseInt(req.query.limit, 10);
+    const limit = Number.isFinite(requestedLimit) && requestedLimit > 0
+      ? Math.min(requestedLimit, 50)
+      : 20;
 
     const skip = (page - 1) * limit;
 
@@ -149,42 +153,31 @@ router.get("/", async (req, res) => {
       }
     }
 
-    const basePipeline = [];
+    const totalRegistrations = await Registration.countDocuments(matchStage);
 
-    if (Object.keys(matchStage).length > 0) {
-      basePipeline.push({ $match: matchStage });
-    }
-
-    // Newest registrations first
-    basePipeline.push({ $sort: { createdAt: -1 } });
-
-    // Lookup event details
-    basePipeline.push({
-      $lookup: {
-        from: "events",
-        localField: "eventId",
-        foreignField: "_id",
-        as: "event"
+    const dataPipeline = [
+      ...(Object.keys(matchStage).length > 0 ? [{ $match: matchStage }] : []),
+      { $sort: { createdAt: -1, _id: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $lookup: {
+          from: "events",
+          localField: "eventId",
+          foreignField: "_id",
+          as: "event"
+        }
+      },
+      {
+        $unwind: {
+          path: "$event",
+          preserveNullAndEmptyArrays: true
+        }
       }
-    });
-
-    basePipeline.push({
-      $unwind: {
-        path: "$event",
-        preserveNullAndEmptyArrays: true
-      }
-    });
-
-    // Count total matching registrations before skip & limit
-    const countPipeline = [...basePipeline, { $count: "total" }];
-    const countResult = await Registration.aggregate(countPipeline);
-    const totalRegistrations = countResult.length > 0 ? countResult[0].total : 0;
-
-    // Apply pagination skip & limit
-    const dataPipeline = [...basePipeline, { $skip: skip }, { $limit: limit }];
+    ];
     const registrations = await Registration.aggregate(dataPipeline);
 
-    const totalPages = Math.ceil(totalRegistrations / limit) || (totalRegistrations === 0 ? 0 : 1);
+    const totalPages = Math.ceil(totalRegistrations / limit);
 
     res.json({
       registrations,

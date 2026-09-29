@@ -8,6 +8,7 @@ export default function AdminRegistrations() {
   const [events, setEvents] = useState([]);
   const [selectedEventId, setSelectedEventId] = useState("");
   const [page, setPage] = useState(1);
+  const [retryCount, setRetryCount] = useState(0);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
@@ -21,7 +22,7 @@ export default function AdminRegistrations() {
   // 🔄 Fetch list of events for the filter dropdown
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_API_URL}/events`)
+      .get(`${import.meta.env.VITE_API_URL}/events`, { params: { limit: 50 } })
       .then((res) => {
         const eventList = Array.isArray(res.data) ? res.data : (res.data.events || []);
         setEvents(eventList);
@@ -44,7 +45,10 @@ export default function AdminRegistrations() {
     }
 
     axios
-      .get(`${import.meta.env.VITE_API_URL}/registrations`, { params })
+      .get(`${import.meta.env.VITE_API_URL}/registrations`, {
+        params,
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      })
       .then((res) => {
         if (!isMounted) return;
         if (res.data && res.data.registrations) {
@@ -80,7 +84,7 @@ export default function AdminRegistrations() {
     return () => {
       isMounted = false;
     };
-  }, [page, selectedEventId]);
+  }, [page, selectedEventId, retryCount]);
 
   const handleEventFilterChange = (e) => {
     setSelectedEventId(e.target.value);
@@ -147,7 +151,7 @@ export default function AdminRegistrations() {
             <p className="error-message">⚠️ {error}</p>
             <button
               className="retry-btn"
-              onClick={() => setPage(1)}
+              onClick={() => setRetryCount((count) => count + 1)}
               style={{ marginTop: "1rem", padding: "0.5rem 1.2rem" }}
             >
               Retry
