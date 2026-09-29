@@ -6,7 +6,7 @@ import "../styles/admin-dashboard.css";
 export default function AdminDashboard() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const [search, setSearch] = useState("");
   const [form, setForm] = useState({
     title: "",
     description: "",
