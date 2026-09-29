@@ -12,6 +12,8 @@ import Ongoing from './pages/Ongoing.jsx'
 import Upcoming from './pages/Upcoming.jsx'
 import Past from './pages/Past.jsx'
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminEvents from "./pages/AdminEvents";
+import AdminRegistrations from "./pages/AdminRegistrations";
 import MyRegistrations from "./pages/MyRegistrations.jsx";
 import EventDetails from "./pages/EventDetails";
 
@@ -81,6 +83,22 @@ function AppRoutes({ user }) {
         element={
           user?.role === "admin"
             ? <AdminDashboard />
+            : <Navigate to="/login" />
+        }
+      />
+      <Route
+        path="/admin/events"
+        element={
+          user?.role === "admin"
+            ? <ProtectedRoute><AdminEvents /></ProtectedRoute>
+            : <Navigate to="/login" />
+        }
+      />
+      <Route
+        path="/admin/registrations"
+        element={
+          user?.role === "admin"
+            ? <ProtectedRoute><AdminRegistrations /></ProtectedRoute>
             : <Navigate to="/login" />
         }
       />
