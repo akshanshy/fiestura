@@ -157,7 +157,20 @@ body.dark-mode {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--admin-text-muted);
+  letter-spacing: 0.3px;
 }
 
 .admin-form input,
@@ -170,6 +183,7 @@ body.dark-mode {
   transition: all 0.3s ease;
   background: var(--search-bg);
   color: var(--admin-text);
+  width: 100%;
 }
 
 .admin-form input:focus,
@@ -188,6 +202,11 @@ body.dark-mode {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
+}
+
+.form-actions.full-width {
+  grid-column: 1 / -1;
+  margin-top: 0.5rem;
 }
 
 .admin-form button {

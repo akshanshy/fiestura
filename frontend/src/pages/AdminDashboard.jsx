@@ -1,49 +1,57 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import "../styles/admin-dashboard.css";
 
 export default function AdminDashboard() {
   const [events, setEvents] = useState([]);
-  const [registrations, setRegistrations] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const [search, setSearch] = useState("");
-  const [eventFilter, setEventFilter] = useState("");
-
   const [form, setForm] = useState({
-  title: "",
-  description: "",
-  startDate: "",
-  endDate: "",
-  category: "",
-  price: ""
-});
+    title: "",
+    description: "",
+    startDate: "",
+    endDate: "",
+    category: "",
+    price: ""
+  });
   const [editId, setEditId] = useState(null);
 
   const token = localStorage.getItem("token");
-  console.log("TOKEN:", token);
 
   const formatDate = (date) => {
-  if (!date) return "Date not available";
+    if (!date) return "Date not available";
+    const parsedDate = new Date(date);
+    if (Number.isNaN(parsedDate.getTime())) {
+      return "Date not available";
+    }
 
-  const parsedDate = new Date(date);
+    return parsedDate.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
 
-  if (Number.isNaN(parsedDate.getTime())) {
-    return "Date not available";
-  }
+  // Helper to safely convert Date / ISO string to YYYY-MM-DD for <input type="date" />
+  const toDateInputValue = (dateStr) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    if (Number.isNaN(date.getTime())) return "";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
-  return parsedDate.toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-};
   // 🔄 Fetch events
   const fetchEvents = async () => {
     try {
       setLoading(true);
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/events`);
-      setEvents(res.data);
+      // Handle both array responses and object responses ({ events: [...] })
+      const eventList = Array.isArray(res.data) ? res.data : (res.data.events || []);
+      setEvents(eventList);
     } catch (err) {
       console.log(err);
     } finally {
@@ -51,28 +59,9 @@ export default function AdminDashboard() {
     }
   };
 
-  // 🔄 Fetch registrations
-  const fetchRegistrations = async () => {
-    const res = await axios.get(`${import.meta.env.VITE_API_URL}/registrations`);
-    setRegistrations(res.data);
-  };
-
   useEffect(() => {
     fetchEvents();
-    fetchRegistrations();
   }, []);
-
-  // 🔍 FILTER LOGIC
-  const filteredRegistrations = registrations.filter((r) => {
-    const matchSearch =
-      r.name.toLowerCase().includes(search.toLowerCase()) ||
-      r.email.toLowerCase().includes(search.toLowerCase());
-
-    const matchEvent =
-      !eventFilter || r.event?.title === eventFilter;
-
-    return matchSearch && matchEvent;
-  });
 
   // ✍️ Handle input
   const handleChange = (e) => {
@@ -82,36 +71,54 @@ export default function AdminDashboard() {
   // ➕ Add / Update
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Frontend event:", form);
 
-    if (editId) {
-      await axios.put(`${import.meta.env.VITE_API_URL}/events/${editId}`, form, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setEditId(null);
-    } else {
-      await axios.post(`${import.meta.env.VITE_API_URL}/events`, form, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+    // 🗓️ Date range validation
+    if (form.startDate && form.endDate) {
+      const start = new Date(form.startDate);
+      const end = new Date(form.endDate);
+      if (end < start) {
+        alert("⚠️ End Date cannot be earlier than Start Date!");
+        return;
+      }
     }
 
-    setForm({
-  title: "",
-  description: "",
-  startDate: "",
-  endDate: "",
-  category: "",
-  price: ""
-});
-    fetchEvents();
+    try {
+      if (editId) {
+        await axios.put(`${import.meta.env.VITE_API_URL}/events/${editId}`, form, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setEditId(null);
+      } else {
+        await axios.post(`${import.meta.env.VITE_API_URL}/events`, form, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      }
+
+      setForm({
+        title: "",
+        description: "",
+        startDate: "",
+        endDate: "",
+        category: "",
+        price: ""
+      });
+      fetchEvents();
+    } catch (err) {
+      alert(err.response?.data?.message || "Error saving event");
+    }
   };
 
   // ❌ Delete
   const handleDelete = async (id) => {
-    await axios.delete(`${import.meta.env.VITE_API_URL}/events/${id}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    fetchEvents();
+    if (!window.confirm("Are you sure you want to delete this event?")) return;
+    try {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/events/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchEvents();
+    } catch (err) {
+      alert(err.response?.data?.message || "Error deleting event");
+    }
   };
 
   // ✏️ Edit
@@ -119,8 +126,8 @@ export default function AdminDashboard() {
     setForm({
       title: event.title,
       description: event.description,
-      startDate: event.startDate?.split("T")[0],
-       endDate: event.endDate?.split("T")[0],
+      startDate: toDateInputValue(event.startDate),
+      endDate: toDateInputValue(event.endDate),
       category: event.category,
       price: event.price || ""
     });
@@ -134,84 +141,117 @@ export default function AdminDashboard() {
         <p>Manage events and view registrations</p>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards & Navigation Links */}
       <div className="admin-stats">
         <div className="stat-card events">
-          <div className="stat-icon"></div>
+          <div className="stat-icon">🎪</div>
           <div className="stat-number">{events.length}</div>
           <div className="stat-label">Total Events</div>
         </div>
-        <div className="stat-card registrations">
-          <div className="stat-icon">👥</div>
-          <div className="stat-number">{registrations.length}</div>
-          <div className="stat-label">Total Registrations</div>
-        </div>
+
+        <Link to="/admin/registrations" className="stat-card registrations clickable">
+          <div className="stat-icon">📋</div>
+          <div className="stat-number">View All</div>
+          <div className="stat-label">Manage Registrations →</div>
+        </Link>
       </div>
 
       {/* Event Form */}
       <div className="admin-form-section">
         <h2>{editId ? "Edit Event" : "Add New Event"}</h2>
         <form className="admin-form" onSubmit={handleSubmit}>
-          <input
-            name="title"
-            value={form.title}
-            onChange={handleChange}
-            placeholder="Event Title"
-            required
-          />
-          <input
-            name="description"
-            value={form.description}
-            onChange={handleChange}
-            placeholder="Event Description"
-            required
-          />
-          <label>Start Date</label>
-<input
-  name="startDate"
-  type="date"
-  value={form.startDate}
-  onChange={handleChange}
-  required
-/>
+          <div className="form-group">
+            <label>Event Title</label>
+            <input
+              name="title"
+              value={form.title}
+              onChange={handleChange}
+              placeholder="e.g. Annual Tech Symposium"
+              required
+            />
+          </div>
 
-<label>End Date</label>
-<input
-  name="endDate"
-  type="date"
-  value={form.endDate}
-  onChange={handleChange}
-  required
-/>
-          <select
-            name="category"
-            value={form.category}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select Category</option>
-<option value="Technical">Technical</option>
-<option value="Cultural">Cultural</option>
-<option value="Sports">Sports</option>
-<option value="Workshop">Workshop</option>
-          </select>
-          <input
-            name="price"
-            type="number"
-            min="0"
-            value={form.price}
-            onChange={handleChange}
-            placeholder="Price in ₹ (0 = Free)"
-          />
-          <div className="form-actions">
+          <div className="form-group">
+            <label>Event Description</label>
+            <input
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              placeholder="Brief summary of event..."
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Start Date 📅</label>
+            <input
+              name="startDate"
+              type="date"
+              value={form.startDate}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>End Date 📅</label>
+            <input
+              name="endDate"
+              type="date"
+              value={form.endDate}
+              onChange={handleChange}
+              min={form.startDate || undefined}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Category</label>
+            <select
+              name="category"
+              value={form.category}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select Category</option>
+              <option value="Technical">Technical</option>
+              <option value="Cultural">Cultural</option>
+              <option value="Sports">Sports</option>
+              <option value="Workshop">Workshop</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>Price (₹)</label>
+            <input
+              name="price"
+              type="number"
+              min="0"
+              value={form.price}
+              onChange={handleChange}
+              placeholder="0 = Free"
+            />
+          </div>
+
+          <div className="form-actions full-width">
             <button type="submit">
               {editId ? "✏️ Update Event" : "➕ Add Event"}
             </button>
             {editId && (
-              <button type="button" onClick={() => {
-                setEditId(null);
-                setForm({ title: "", description: "", startDate: "", endDate: "", category: "", price: "" });
-              }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setEditId(null);
+                  setForm({
+                    title: "",
+                    description: "",
+                    startDate: "",
+                    endDate: "",
+                    category: "",
+                    price: ""
+                  });
+                }}
+              >
                 Cancel
               </button>
             )}

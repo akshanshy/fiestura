@@ -130,27 +130,71 @@ router.get("/user/:userId", async (req, res) => {
 });
 
 
-// 🧑‍💼 Admin: all registrations
+// 🧑‍💼 Admin: registrations with server-side pagination & optional eventId filter
 router.get("/", async (req, res) => {
   try {
-    const registrations = await Registration.aggregate([
-      {
-        $lookup: {
-          from: "events",
-          localField: "eventId",
-          foreignField: "_id",
-          as: "event"
-        }
-      },
-      {
-        $unwind: {
-          path: "$event",
-          preserveNullAndEmptyArrays: true
-        }
-      }
-    ]);
+    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    let limit = parseInt(req.query.limit, 10) || 20;
+    if (isNaN(limit) || limit < 1) limit = 20;
+    if (limit > 50) limit = 50;
 
-    res.json(registrations);
+    const skip = (page - 1) * limit;
+
+    const matchStage = {};
+    if (req.query.eventId && req.query.eventId.trim() !== "") {
+      if (mongoose.Types.ObjectId.isValid(req.query.eventId)) {
+        matchStage.eventId = new mongoose.Types.ObjectId(req.query.eventId);
+      } else {
+        matchStage.eventId = req.query.eventId;
+      }
+    }
+
+    const basePipeline = [];
+
+    if (Object.keys(matchStage).length > 0) {
+      basePipeline.push({ $match: matchStage });
+    }
+
+    // Newest registrations first
+    basePipeline.push({ $sort: { createdAt: -1 } });
+
+    // Lookup event details
+    basePipeline.push({
+      $lookup: {
+        from: "events",
+        localField: "eventId",
+        foreignField: "_id",
+        as: "event"
+      }
+    });
+
+    basePipeline.push({
+      $unwind: {
+        path: "$event",
+        preserveNullAndEmptyArrays: true
+      }
+    });
+
+    // Count total matching registrations before skip & limit
+    const countPipeline = [...basePipeline, { $count: "total" }];
+    const countResult = await Registration.aggregate(countPipeline);
+    const totalRegistrations = countResult.length > 0 ? countResult[0].total : 0;
+
+    // Apply pagination skip & limit
+    const dataPipeline = [...basePipeline, { $skip: skip }, { $limit: limit }];
+    const registrations = await Registration.aggregate(dataPipeline);
+
+    const totalPages = Math.ceil(totalRegistrations / limit) || (totalRegistrations === 0 ? 0 : 1);
+
+    res.json({
+      registrations,
+      pagination: {
+        page,
+        limit,
+        totalRegistrations,
+        totalPages
+      }
+    });
 
   } catch (err) {
     res.status(500).json({
