@@ -83,6 +83,18 @@ body.dark-mode {
   text-align: center;
 }
 
+a.stat-card {
+  display: block;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+a.stat-card:focus-visible {
+  outline: 3px solid var(--admin-primary);
+  outline-offset: 4px;
+}
+
 .stat-card:hover {
   transform: translateY(-6px) scale(1.02);
   box-shadow: var(--admin-shadow-hover);
