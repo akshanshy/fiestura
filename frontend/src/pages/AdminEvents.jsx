@@ -100,7 +100,8 @@ export default function AdminEvents() {
         startDate: "",
         endDate: "",
         category: "",
-        price: ""
+        price: "",
+        capacity: ""
       });
       fetchEvents();
     } catch (err) {
@@ -129,7 +130,8 @@ export default function AdminEvents() {
       startDate: toDateInputValue(event.startDate),
       endDate: toDateInputValue(event.endDate),
       category: event.category,
-      price: event.price || ""
+      price: event.price || "",
+      capacity: event.capacity || ""
     });
     setEditId(event._id);
   };
@@ -223,6 +225,19 @@ export default function AdminEvents() {
             />
           </div>
 
+          <div className="form-group">
+  <label>Capacity</label>
+  <input
+    name="capacity"
+    type="number"
+    min="1"
+    value={form.capacity}
+    onChange={handleChange}
+    placeholder="Maximum participants"
+    required
+  />
+</div>
+
           <div className="form-actions full-width">
             <button type="submit">
               {editId ? "✏️ Update Event" : "➕ Add Event"}
@@ -238,7 +253,8 @@ export default function AdminEvents() {
                     startDate: "",
                     endDate: "",
                     category: "",
-                    price: ""
+                    price: "",
+                    capacity: ""
                   });
                 }}
               >

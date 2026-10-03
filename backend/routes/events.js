@@ -59,7 +59,8 @@ router.post("/", verifyToken, verifyAdmin, validate(createEventSchema), async (r
       category,
       location,
       image,
-      price
+      price,
+      capacity
     } = req.body;
 
     // validation
@@ -84,7 +85,8 @@ router.post("/", verifyToken, verifyAdmin, validate(createEventSchema), async (r
       category,
       location,
       image,
-      price: price || 0
+      price: price || 0,
+      capacity: capacity || 1
     });
     await clearEventCache();
     res.status(201).json(event);
@@ -97,50 +99,88 @@ router.post("/", verifyToken, verifyAdmin, validate(createEventSchema), async (r
 // 📥 GET ALL EVENTS (with optional category filter)
 router.get("/", async (req, res) => {
   try {
-    const { category } = req.query;
+    const { category, status } = req.query;
 
     const page = Math.max(parseInt(req.query.page) || 1, 1);
-    const limit = Math.min(parseInt(req.query.limit) || 20, 50);
-
+    const limit = Math.min(parseInt(req.query.limit) || 12, 50);
     const skip = (page - 1) * limit;
 
-    const query = category ? { category } : {};
+    // Start of today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    // Create a unique Redis key for this query
-    const cacheKey = `events:${category || "all"}:page:${page}:limit:${limit}`;
+    // One year ago
+    const oneYearAgo = new Date(today);
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
-    // 1. Check Redis
+    let query = {};
+
+    // Optional category filter
+    if (category) {
+      query.category = category;
+    }
+
+    // Status filtering
+    if (status === "upcoming") {
+      query.startDate = {
+        $gt: new Date(today.getTime() + 24 * 60 * 60 * 1000)
+      };
+    }
+
+    if (status === "ongoing") {
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      query.startDate = {
+        $lte: tomorrow
+      };
+
+      query.endDate = {
+        $gte: today
+      };
+    }
+
+    if (status === "past") {
+      query.endDate = {
+        $lt: today,
+        $gte: oneYearAgo
+      };
+    }
+
+    // Unique Redis key for every combination
+    const cacheKey =
+      `events:${status || "all"}:${category || "all"}:page:${page}:limit:${limit}`;
+
+    // Redis
     const cachedEvents = await redisClient.get(cacheKey);
 
     if (cachedEvents) {
-  console.log("Redis cache HIT:", cacheKey);
-  //await redisClient.del(cacheKey);
-  const ttl = await redisClient.ttl(cacheKey);
-  console.log("TTL remaining:", ttl);
+      console.log("Redis cache HIT:", cacheKey);
 
-  return res.status(200).json(JSON.parse(cachedEvents));
-}
+      const ttl = await redisClient.ttl(cacheKey);
+      console.log("TTL remaining:", ttl);
+
+      return res.status(200).json(JSON.parse(cachedEvents));
+    }
 
     console.log("Redis cache MISS:", cacheKey);
-      
-    // 2. Redis doesn't have the data → MongoDB
+
+    // MongoDB
     const events = await Event.find(query)
-      .sort({ createdAt: -1 })
+      .sort({ startDate: -1 })
       .skip(skip)
       .limit(limit);
 
-    const updatedEvents = events.map((event) => {
-      const status = getEventStatus(
+    // Calculate status for returned events
+    const updatedEvents = events.map((event) => ({
+      ...event.toObject(),
+      status: getEventStatus(
         event.startDate,
         event.endDate
-      );
+      )
+    }));
 
-      return {
-        ...event.toObject(),
-        status
-      };
-    });
-
+    // Total matching events
     const totalEvents = await Event.countDocuments(query);
 
     const responseData = {
@@ -153,23 +193,20 @@ router.get("/", async (req, res) => {
       }
     };
 
-    // 3. Store MongoDB result in Redis
+    // Cache for 60 seconds
     await redisClient.set(
       cacheKey,
       JSON.stringify(responseData),
-       {
-       EX: 60
+      {
+        EX: 60
       }
-      
     );
-    const ttl = await redisClient.ttl(cacheKey);
-     //console.log("TTL:", ttl);
-    //console.log("Data stored in Redis:", cacheKey);
 
-    // 4. Return response
     res.status(200).json(responseData);
 
   } catch (err) {
+    console.error("Error fetching events:", err);
+
     res.status(500).json({
       message: err.message
     });

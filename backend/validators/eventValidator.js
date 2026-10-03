@@ -33,6 +33,12 @@ export const createEventSchema = z
         error: "Price must be a number",
       })
       .min(0, "Price cannot be negative"),
+      capacity: z.coerce
+  .number({
+    error: "Capacity must be a number",
+  })
+  .int("Capacity must be a whole number")
+  .min(1, "Capacity must be at least 1"),
   })
   .refine(
     (data) => data.endDate >= data.startDate,

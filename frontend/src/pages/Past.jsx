@@ -10,22 +10,22 @@ export default function Past() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    axios
+  axios
       .get(`${API}/events`)
-      .then((res) => {
+    .then((res) => {
         const pastEvents = res.data.filter(
           (event) => event.status === 'past'
         )
 
-        setEvents(pastEvents)
-      })
-      .catch((error) => {
-        console.error('Error fetching past events:', error)
-      })
-      .finally(() => {
-        setLoading(false)
-      })
-  }, [])
+      setEvents(pastEvents);
+    })
+    .catch((error) => {
+      console.error("Error fetching past events:", error);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+}, []);
 
   const filteredEvents =
     selectedYear === 'all'

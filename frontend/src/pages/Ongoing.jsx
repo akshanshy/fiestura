@@ -1,66 +1,69 @@
-import '../styles/ongoing.css'
-import { useEffect, useState } from 'react'
-import axios from 'axios'
+import "../styles/ongoing.css";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import EventCard from "../components/EventCard";
 
-function sharePage() {
-  if (navigator.share) {
-    navigator.share({
-      title: document.title,
-      text: 'Check out this amazing event!',
-      url: window.location.href
-    }).catch(() => {})
-  } else {
-    alert('Sharing not supported on this browser.')
-  }
-}
+export default function Upcoming() {
+  const [events, setEvents] = useState([]);
 
-export default function Ongoing() {
-  const [events, setEvents] = useState([])
+  const [page, setPage] = useState(1);
+
+  const [pagination, setPagination] = useState({
+    page: 1,
+    totalPages: 1,
+  });
 
   useEffect(() => {
-   axios
-  .get(`${import.meta.env.VITE_API_URL}/events`)
-  .then((res) => {
-    const ongoingEvents = res.data.filter(
-      (event) => event.status === "ongoing"
-    );
-
-    setEvents(ongoingEvents);
-  })
-  .catch((err) => console.log(err))
-  }, [])
-
-  function toggleFullscreen() {
-    if (document.fullscreenElement) document.exitFullscreen()
-    else document.documentElement.requestFullscreen?.()
-  }
+    axios
+      .get(
+        `${import.meta.env.VITE_API_URL}/events?status=ongoing&page=${page}&limit=12`
+      )
+      .then((res) => {
+        setEvents(res.data.events);
+        setPagination(res.data.pagination);
+      })
+      .catch((err) => console.log(err));
+  }, [page]);
 
   return (
     <div className="container">
       <div className="header">
-        <h1>🔥 Ongoing Events</h1>
-        <p>Join the action happening right now!</p>
+        <h1>⏳ ongoing Events</h1>
+        <p>Register now and secure your spot!</p>
       </div>
 
-      {/* ✅ USE REUSABLE COMPONENT */}
       <div className="events-grid">
-        {events.map((event) => (
-          <EventCard key={event._id} event={event} />
-        ))}
+        {events.length === 0 ? (
+          <p>No ongoing events</p>
+        ) : (
+          events.map((event) => (
+            <EventCard key={event._id} event={event} />
+          ))
+        )}
       </div>
 
-      <div className="floating-actions">
-        <button className="floating-btn" onClick={() => location.reload()}>
-          🔄
-        </button>
-        <button className="floating-btn" onClick={() => alert('Notifications coming soon')}>
-          🔔
-        </button>
-        <button className="floating-btn" onClick={toggleFullscreen}>
-          ⛶
-        </button>
-      </div>
+      {/* Pagination */}
+      {pagination.totalPages > 0 && (
+        <div className="pagination">
+          <button
+            disabled={page === 1}
+            onClick={() => setPage(page - 1)}
+          >
+            ← Previous
+          </button>
+
+          <span>
+            Page {pagination.page} of {pagination.totalPages}
+          </span>
+
+          <button
+            disabled={page === pagination.totalPages}
+            onClick={() => setPage(page + 1)}
+          >
+            Next →
+          </button>
+        </div>
+      )}
     </div>
-  )
+  );
 }
