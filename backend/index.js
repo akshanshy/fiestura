@@ -52,6 +52,8 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => console.log(err));
 
 // test
+
+
 app.get("/", (req, res) => {
   res.send("Backend working ✅");
 });
@@ -59,3 +61,8 @@ app.get("/", (req, res) => {
 app.listen(5000, () => {
   console.log("Server running on http://localhost:5000");
 });
+
+console.log(
+  "MongoDB URI host:",
+  process.env.MONGO_URI?.split("@")[1]
+);

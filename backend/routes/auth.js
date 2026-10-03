@@ -4,11 +4,14 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { randomBytes, createHash } from "node:crypto";
 import { sendResetEmail } from "../utils/sendEmail.js";
+import { validate } from "../middleware/validate.js";
+import { signupSchema } from "../validators/authValidator.js";
 const router = express.Router();
 
 
+
 // 🔐 SIGNUP
-router.post("/signup", async (req, res) => {
+router.post("/signup", validate(signupSchema), async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
