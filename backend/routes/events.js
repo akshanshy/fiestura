@@ -1,6 +1,8 @@
 import express from "express";
 import Event from "../models/Event.js";
 import redisClient from "../config/redis.js";
+import { validate } from "../middleware/validate.js";
+import { createEventSchema } from "../validators/eventValidator.js";
 import { verifyToken } from "../middleware/verifyToken.js";
 import { verifyAdmin } from "../middleware/verifyAdmin.js";
 
@@ -46,7 +48,7 @@ function getEventStatus(startDate, endDate) {
 }
 
 // ➕ CREATE EVENT
-router.post("/", verifyToken, verifyAdmin, async (req, res) => {
+router.post("/", verifyToken, verifyAdmin, validate(createEventSchema), async (req, res) => {
   console.log("Received event:", req.body);
   try {
     const {

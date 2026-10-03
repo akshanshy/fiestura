@@ -5,7 +5,12 @@ import jwt from "jsonwebtoken";
 import { randomBytes, createHash } from "node:crypto";
 import { sendResetEmail } from "../utils/sendEmail.js";
 import { validate } from "../middleware/validate.js";
-import { signupSchema } from "../validators/authValidator.js";
+import {
+  signupSchema,
+  loginSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema
+} from "../validators/authValidator.js";
 const router = express.Router();
 
 
@@ -39,7 +44,7 @@ router.post("/signup", validate(signupSchema), async (req, res) => {
 
 
 //  LOGIN
-router.post("/login", async (req, res) => {
+router.post("/login",validate(loginSchema),async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -69,15 +74,10 @@ router.post("/login", async (req, res) => {
 
 
 // 🔑 FORGOT PASSWORD
-router.post("/forgot-password", async (req, res) => {
+router.post("/forgot-password", validate(forgotPasswordSchema), async (req, res) => {
   try {
     const { email } = req.body;
 
-    if (!email) {
-      return res.status(400).json({
-        message: "Email is required",
-      });
-    }
 
     const user = await User.findOne({ email });
 
@@ -122,21 +122,9 @@ router.post("/forgot-password", async (req, res) => {
 
 
 // 🔑 RESET PASSWORD
-router.post("/reset-password", async (req, res) => {
+router.post("/reset-password", validate(resetPasswordSchema), async (req, res) => {
   try {
     const { token, newPassword } = req.body;
-
-    if (!token || !newPassword) {
-      return res.status(400).json({
-        message: "Token and new password are required",
-      });
-    }
-
-    if (newPassword.length < 6) {
-      return res.status(400).json({
-        message: "Password must be at least 6 characters",
-      });
-    }
 
     // Hash the token received from the reset link
     const hashedToken = createHash("sha256")

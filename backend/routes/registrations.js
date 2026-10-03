@@ -4,11 +4,13 @@ import Event from "../models/Event.js";
 import mongoose from "mongoose";
 import { verifyToken } from "../middleware/verifyToken.js";
 import { verifyAdmin } from "../middleware/verifyAdmin.js";
+import { validate } from "../middleware/validate.js";
+import { registrationSchema } from "../validators/registrationValidator.js";
 const router = express.Router();
 
 
 // ➕ Register for event
-router.post("/", async (req, res) => {
+router.post("/", validate(registrationSchema), async (req, res) => {
   const session = await mongoose.startSession();
 
   try {
