@@ -22,7 +22,7 @@ export const createEventSchema = z
       error: "Invalid end date",
     }),
 
-    category: z.enum(["ongoing", "upcoming", "past"], {
+    category: z.enum(["cultural", "sports", "workshow","technical"], {
       error: "Invalid event category",
     }),
 
@@ -32,18 +32,6 @@ export const createEventSchema = z
       })
       .min(0, "Price cannot be negative"),
 
-    location: z
-      .string()
-      .trim()
-      .min(2, "Location is required")
-      .max(200, "Location cannot exceed 200 characters"),
-
-    image: z
-      .string()
-      .trim()
-      .url("Image must be a valid URL")
-      .optional()
-      .or(z.literal("")),
   })
   .refine(
     (data) => data.endDate >= data.startDate,
