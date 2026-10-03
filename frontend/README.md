@@ -1,4 +1,4 @@
-# Fiesturo (React)
+# Fiestura (React)
 
 Regenerated React project for your Fiesturo site.
 
