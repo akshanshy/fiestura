@@ -22,16 +22,17 @@ export const createEventSchema = z
       error: "Invalid end date",
     }),
 
-    category: z.enum(["cultural", "sports", "workshow","technical"], {
-      error: "Invalid event category",
-    }),
+    category: z
+      .string()
+      .trim()
+      .min(2, "Category is required")
+      .max(50, "Category cannot exceed 50 characters"),
 
     price: z.coerce
       .number({
         error: "Price must be a number",
       })
       .min(0, "Price cannot be negative"),
-
   })
   .refine(
     (data) => data.endDate >= data.startDate,
