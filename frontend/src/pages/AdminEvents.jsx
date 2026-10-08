@@ -240,7 +240,7 @@ export default function AdminEvents() {
 
           <div className="form-actions full-width">
             <button type="submit">
-              {editId ? "✏️ Update Event" : "➕ Add Event"}
+              {editId ? " Update Event" : "Add Event"}
             </button>
             {editId && (
               <button
