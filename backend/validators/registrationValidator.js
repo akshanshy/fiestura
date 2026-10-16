@@ -1,7 +1,8 @@
 import { z } from "zod";
 
 export const registrationSchema = z.object({
-  eventId: z
-    .string()
-    .regex(/^[0-9a-fA-F]{24}$/, "Invalid event ID"),
+  userId: z.string().min(1, "User ID is required"),
+  eventId: z.string().min(1, "Event ID is required"),
+  name: z.string().optional(),
+  email: z.string().email().optional(),
 });

@@ -11,6 +11,17 @@ const router = express.Router();
 
 // ➕ Register for event
 router.post("/", validate(registrationSchema), async (req, res) => {
+  console.log("ROUTE BODY:", JSON.stringify(req.body, null, 2));
+
+const { userId, eventId, name, email } = req.body;
+
+console.log("DESTRUCTURED:", {
+  userId,
+  eventId,
+  name,
+  email,
+});
+
   const session = await mongoose.startSession();
 
   try {
@@ -58,7 +69,6 @@ router.post("/", validate(registrationSchema), async (req, res) => {
         message: "Event is full"
       });
     }
-
     // 3. Create registration
     const registration = await Registration.create(
       [
