@@ -57,7 +57,7 @@ console.log("DESTRUCTURED:", {
         }
       },
       {
-        new: true,
+        returnDocument: "after",
         session
       }
     );
