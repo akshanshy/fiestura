@@ -25,6 +25,21 @@ export default function EventCard({ event }) {
     });
 }, [event._id]);
 
+const getErrorMessage = (err) => {
+  const data = err.response?.data;
+
+  if (typeof data === "string") {
+    return data;
+  }
+
+  return (
+    data?.message ||
+    data?.error ||
+    err.message ||
+    "Something went wrong. Please try again."
+  );
+};
+
   const cancelRegistration = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
 
@@ -39,7 +54,8 @@ export default function EventCard({ event }) {
       alert("Registration cancelled ❌");
       setIsRegistered(false);
     } catch (err) {
-      alert(err.response?.data || "Error");
+      console.error("Cancellation error:", err.response?.data || err);
+      alert(getErrorMessage(err));
     }
   };
 
@@ -58,7 +74,8 @@ export default function EventCard({ event }) {
       alert("Registered successfully 🎉");
       setIsRegistered(true);
     } catch (err) {
-      alert(err.response?.data || "Error");
+      console.error("Registration error:", err.response?.data || err);
+      alert(getErrorMessage(err));
     }
   };
   const formatDate = (date) => {
@@ -104,7 +121,8 @@ export default function EventCard({ event }) {
         await registerUser();
       },
       onFailure: (msg) => {
-        alert(`Payment failed: ${msg}`);
+        console.error("Payment failed:", msg);
+        alert(getErrorMessage({ response: { data: msg } }));
       },
     });
   };
