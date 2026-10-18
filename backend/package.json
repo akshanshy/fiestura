@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
-  "scripts": {
-    "dev": "nodemon index.js",
-    "start": "node index.js"
-  },
+ "scripts": {
+  "dev": "nodemon index.js",
+  "start": "node index.js",
+  "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+  "test:watch": "npm test -- --watch"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",

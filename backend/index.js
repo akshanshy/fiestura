@@ -1,68 +1,17 @@
-import dotenv from "dotenv";
-dotenv.config();
-console.log("Redis URL loaded:", Boolean(process.env.REDIS_URL));
-import redisClient from "./config/redis.js";
 
-import express from "express";
+import "dotenv/config";
 import mongoose from "mongoose";
-import cors from "cors";
-import paymentRoutes from "./routes/payment.js";
-import eventRoutes from "./routes/events.js";
-import authRoutes from "./routes/auth.js";
-import registrationRoutes from "./routes/registrations.js";
+import redisClient from "./config/redis.js";
+import app from "./app.js";
 
-
-
-
-const app = express();
-
-// 🔥 CORS MUST BE FIRST
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://fiestura.vercel.app",
-    "https://fiestura-45xwf080z-infine.vercel.app"
-  ],
-  credentials: true
-}));
-
-// THEN JSON (with rawBody capture for webhook signature verification)
-app.use(
-  express.json({
-    verify: (req, res, buf) => {
-      req.rawBody = buf;
-    },
-  })
-);
-
-// 🔥 ROUTES AFTER
-app.use("/events", eventRoutes);
-app.use("/auth", authRoutes);
-app.use("/registrations", registrationRoutes);
-app.use("/api/payment", paymentRoutes);
-
-// DB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected ✅"))
-  .catch(err => console.log(err));
+  .catch(err => console.error("MongoDB connection error:", err));
 
-
- redisClient.connect()
+redisClient.connect()
   .then(() => console.log("Redis connected ✅"))
-  .catch(err => console.log(err));
-
-// test
-
-
-app.get("/", (req, res) => {
-  res.send("Backend working ✅");
-});
+  .catch(err => console.error("Redis connection error:", err));
 
 app.listen(5000, () => {
   console.log("Server running on http://localhost:5000");
 });
-
-console.log(
-  "MongoDB URI host:",
-  process.env.MONGO_URI?.split("@")[1]
-);
