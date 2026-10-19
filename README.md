@@ -102,7 +102,7 @@ sequenceDiagram
 - What is cached: [[e.g. event listings and single event lookups]]
 - TTL: [[e.g. 60 seconds]]
 - Invalidation: [[e.g. cache keys are cleared when an event is created, updated or deleted, or when a registration changes available capacity]]
-- Result: [[X ms → Y ms on GET /events, measured with ... ]]
+
 
 ### 3. Database performance
 
