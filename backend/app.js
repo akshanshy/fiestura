@@ -1,7 +1,7 @@
 
 import express from "express";
 import cors from "cors";
-
+import airoutes from "./routes/ai.js";
 import paymentRoutes from "./routes/payment.js";
 import eventRoutes from "./routes/events.js";
 import authRoutes from "./routes/auth.js";
@@ -28,6 +28,7 @@ app.use("/events", eventRoutes);
 app.use("/auth", authRoutes);
 app.use("/registrations", registrationRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/ai", airoutes);
 
 app.get("/", (req, res) => {
   res.send("Backend working ✅");
