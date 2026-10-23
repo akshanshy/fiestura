@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import axios from "axios";
+import "./AIChatWidget.css";
 
 function AIChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,41 +34,32 @@ function AIChatWidget() {
   };
 
   return (
-    <div
-  style={{
-    position: "fixed",
-    bottom: "20px",
-    right: "20px",
-    zIndex: 99999,
-    backgroundColor: "#4f46e5",
-    padding: "16px",
-    borderRadius: "12px",
-    color: "white",
-  }}
->
+    <div className="ai-chat-widget">
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="rounded-full bg-indigo-600 px-5 py-3 text-white shadow-lg"
+          className="ai-chat-toggle"
         >
           AI Assistant
         </button>
       )}
 
       {isOpen && (
-        <div className="w-80 overflow-hidden rounded-xl border bg-white shadow-xl">
-          <div className="flex items-center justify-between bg-indigo-600 p-4 text-white">
-            <h3 className="font-semibold">AI-Fiestura</h3>
+        <div className="ai-chat-panel">
+          <div className="ai-chat-header">
+            <h3>AI-Fiestura</h3>
+
             <button
               onClick={() => setIsOpen(false)}
+              className="ai-chat-close"
               aria-label="Close AI assistant"
             >
-
+              ×
             </button>
           </div>
 
-          <div className="space-y-3 p-4">
-            <div className="max-h-60 overflow-y-auto text-sm text-gray-700">
+          <div className="ai-chat-body">
+            <div className="ai-chat-reply">
               {reply || "Hi! Ask me to find events for you."}
             </div>
 
@@ -78,13 +70,14 @@ function AIChatWidget() {
                 if (e.key === "Enter") sendMessage();
               }}
               placeholder="Ask about events..."
-              className="w-full rounded-lg border p-2 text-sm text-gray-900"
+              className="ai-chat-input"
+              aria-label="Message for AI-Fiestura"
             />
 
             <button
               onClick={sendMessage}
               disabled={loading || !message.trim()}
-              className="w-full rounded-lg bg-indigo-600 p-2 text-white disabled:opacity-50"
+              className="ai-chat-send"
             >
               {loading ? "Searching..." : "Send"}
             </button>
