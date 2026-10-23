@@ -16,7 +16,7 @@ import AdminEvents from "./pages/AdminEvents";
 import AdminRegistrations from "./pages/AdminRegistrations";
 import MyRegistrations from "./pages/MyRegistrations.jsx";
 import EventDetails from "./pages/EventDetails";
-
+import AIChatWidget from "./components/AIChatWidget";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function useBodyPageClass() {
@@ -62,56 +62,56 @@ export default function App() {
 
   return <AppRoutes user={user} />;
 }
+
 function AppRoutes({ user }) {
   useBodyPageClass();
 
   return (
-    <Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/my-registrations" element={<MyRegistrations />} />
+        <Route path="/events/:id" element={<EventDetails />} />
 
-      <Route path="/" element={<Home />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password/:token" element={<ResetPassword />} />
-      <Route path="/my-registrations" element={<MyRegistrations />} />
-      <Route path="/events/:id" element={<EventDetails />} />
+        <Route
+          path="/admin"
+          element={
+            user?.role === "admin"
+              ? <AdminDashboard />
+              : <Navigate to="/login" />
+          }
+        />
+        <Route
+          path="/admin/events"
+          element={
+            user?.role === "admin"
+              ? <ProtectedRoute><AdminEvents /></ProtectedRoute>
+              : <Navigate to="/login" />
+          }
+        />
+        <Route
+          path="/admin/registrations"
+          element={
+            user?.role === "admin"
+              ? <ProtectedRoute><AdminRegistrations /></ProtectedRoute>
+              : <Navigate to="/login" />
+          }
+        />
 
-      {/* 🔐 ADMIN ROUTE */}
-      <Route
-        path="/admin"
-        element={
-          user?.role === "admin"
-            ? <AdminDashboard />
-            : <Navigate to="/login" />
-        }
-      />
-      <Route
-        path="/admin/events"
-        element={
-          user?.role === "admin"
-            ? <ProtectedRoute><AdminEvents /></ProtectedRoute>
-            : <Navigate to="/login" />
-        }
-      />
-      <Route
-        path="/admin/registrations"
-        element={
-          user?.role === "admin"
-            ? <ProtectedRoute><AdminRegistrations /></ProtectedRoute>
-            : <Navigate to="/login" />
-        }
-      />
+        <Route path="/registration" element={<ProtectedRoute><Registration /></ProtectedRoute>} />
+        <Route path="/ongoing" element={<ProtectedRoute><Ongoing /></ProtectedRoute>} />
+        <Route path="/upcoming" element={<ProtectedRoute><Upcoming /></ProtectedRoute>} />
+        <Route path="/past" element={<ProtectedRoute><Past /></ProtectedRoute>} />
 
-      {/* 🔒 PROTECTED ROUTES */}
-      <Route path="/registration" element={<ProtectedRoute><Registration /></ProtectedRoute>} />
-      <Route path="/ongoing" element={<ProtectedRoute><Ongoing /></ProtectedRoute>} />
-      <Route path="/upcoming" element={<ProtectedRoute><Upcoming /></ProtectedRoute>} />
-      <Route path="/past" element={<ProtectedRoute><Past /></ProtectedRoute>} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
 
-      {/* redirects */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-
-    </Routes>
+      <AIChatWidget />
+    </>
   );
 }
