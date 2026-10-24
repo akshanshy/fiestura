@@ -13,9 +13,7 @@ export default function Navbar() {
   const [isDark, setIsDark] = useState(() => localStorage.getItem('theme') === 'dark')
 
   const user = JSON.parse(localStorage.getItem("user"));
-  {user?.role === "admin" && (
-  <Link to="/admin">Admin Panel</Link>
-  )}
+  
   const navigate = useNavigate();
   useEffect(() => {
     if (isDark) {
@@ -59,9 +57,7 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="logo">
-        <span className="logo-icon">
-          <img src="/a.jpeg" alt="" />
-        </span>
+        <Link to="/" className="logo-text">fiestura</Link>
       </div>
 
       <ul className="nav-links">

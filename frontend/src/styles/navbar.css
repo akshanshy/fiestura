@@ -1,18 +1,123 @@
-/* 🔥 MAIN NAVBAR GLASSMORPHISM */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Playfair+Display:ital,wght@1,700&display=swap");
+
+/* =========================================================
+   THEME TOKENS
+   Light is the default. Your React code already toggles
+   body.dark-mode, so the dark values below switch with it.
+   ========================================================= */
+.navbar {
+  --accent: #b8893a;
+
+  --navbar-bg: rgba(255, 255, 255, 0.86);
+  --navbar-border: rgba(20, 20, 30, 0.08);
+  --navbar-shadow: 0 8px 28px rgba(20, 20, 30, 0.08);
+  --logo-color: #14141c;
+
+  --nav-text: rgba(20, 20, 30, 0.7);
+  --nav-text-hover: #14141c;
+  --nav-hover-bg: rgba(20, 20, 30, 0.06);
+  --nav-active-bg: #9e9eb8;
+  --nav-active-text: #ffffff;
+  --nav-active-shadow: 0 6px 16px rgba(20, 20, 30, 0.22);
+
+  --search-bg: #f3f3f6;
+  --search-border: #e3e3ea;
+  --search-border-hover: #cfcfdb;
+  --search-border-focus: #14141c;
+  --search-bg-focus: #ffffff;
+  --search-focus-shadow: 0 0 0 4px rgba(20, 20, 30, 0.08);
+  --search-text: #14141c;
+  --search-placeholder: rgba(20, 20, 30, 0.45);
+  --search-icon: rgba(20, 20, 30, 0.5);
+  --search-icon-focus: #14141c;
+
+  --login-text: #14141c;
+  --login-hover-bg: rgba(20, 20, 30, 0.06);
+  --signup-bg: #14141c;
+  --signup-text: #ffffff;
+  --signup-shadow: 0 6px 16px rgba(20, 20, 30, 0.2);
+  --signup-hover-shadow: 0 10px 22px rgba(20, 20, 30, 0.3);
+
+  --dropdown-bg: rgba(255, 255, 255, 0.98);
+  --dropdown-border: rgba(20, 20, 30, 0.1);
+  --dropdown-shadow: 0 20px 44px rgba(20, 20, 30, 0.16);
+  --dropdown-text: rgba(20, 20, 30, 0.75);
+  --dropdown-text-hover: #14141c;
+  --dropdown-hover: rgba(20, 20, 30, 0.06);
+}
+
+body.dark-mode .navbar {
+  --accent: #e0b865;
+
+  --navbar-bg: rgba(14, 14, 38, 0.86);
+  --navbar-border: rgba(255, 255, 255, 0.08);
+  --navbar-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+  --logo-color: #ffffff;
+
+  --nav-text: rgba(255, 255, 255, 0.7);
+  --nav-text-hover: #ffffff;
+  --nav-hover-bg: rgba(255, 255, 255, 0.08);
+  --nav-active-bg: #ffffff;
+  --nav-active-text: #14141c;
+  --nav-active-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+
+  --search-bg: rgba(255, 255, 255, 0.07);
+  --search-border: rgba(255, 255, 255, 0.13);
+  --search-border-hover: rgba(255, 255, 255, 0.28);
+  --search-border-focus: #ffffff;
+  --search-bg-focus: rgba(255, 255, 255, 0.11);
+  --search-focus-shadow: 0 0 0 4px rgba(255, 255, 255, 0.12);
+  --search-text: #ffffff;
+  --search-placeholder: rgba(255, 255, 255, 0.45);
+  --search-icon: rgba(255, 255, 255, 0.55);
+  --search-icon-focus: #ffffff;
+
+  --login-text: rgba(255, 255, 255, 0.9);
+  --login-hover-bg: rgba(255, 255, 255, 0.1);
+  --signup-bg: #ffffff;
+  --signup-text: #14141c;
+  --signup-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+  --signup-hover-shadow: 0 10px 22px rgba(0, 0, 0, 0.6);
+
+  --dropdown-bg: rgba(22, 22, 28, 0.98);
+  --dropdown-border: rgba(255, 255, 255, 0.1);
+  --dropdown-shadow: 0 20px 44px rgba(0, 0, 0, 0.6);
+  --dropdown-text: rgba(255, 255, 255, 0.78);
+  --dropdown-text-hover: #ffffff;
+  --dropdown-hover: rgba(255, 255, 255, 0.08);
+}
+
+/* =========================================================
+   MAIN NAVBAR
+   ========================================================= */
 .navbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 20px;
   padding: 10px 32px;
-  background: var(--navbar-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--navbar-border);
-  box-shadow: var(--navbar-shadow);
   min-height: 68px;
   position: relative;
   z-index: 9999;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--navbar-bg);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border-bottom: 1px solid var(--navbar-border);
+  box-shadow: var(--navbar-shadow);
+  font-family: "DM Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+/* Signature detail: a fine gold hairline that fades out at both ends */
+.navbar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent) 50%, transparent);
+  pointer-events: none;
 }
 
 body.page-home .navbar {
@@ -27,98 +132,150 @@ body.page-home {
   padding-top: 68px;
 }
 
-/* LOGO */
+/* =========================================================
+   LOGO (text wordmark)
+   ========================================================= */
 .logo {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
-.logo img {
-  height: 44px;
-  width: auto;
-  max-width: 200px;
-  filter: var(--logo-filter);
-  transition: transform 0.3s ease;
-  object-fit: contain;
+.logo-text {
+  display: inline-block;
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+  font-size: 2rem;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--logo-color);
+  text-decoration: none;
+  cursor: pointer;
+  transform-origin: 50% 85%;
+  transition: color 0.3s ease;
 }
 
-.logo img:hover {
-  transform: scale(1.04);
+.logo-text:hover {
+  animation: logo-shake 0.6s ease-in-out;
 }
 
-/* NAV LINKS */
+.logo-text:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+@keyframes logo-shake {
+  0%,
+  100% {
+    transform: rotate(0) translateX(0);
+  }
+  15% {
+    transform: rotate(-6deg) translateX(-2px);
+  }
+  30% {
+    transform: rotate(5deg) translateX(2px);
+  }
+  45% {
+    transform: rotate(-4deg) translateX(-1px);
+  }
+  60% {
+    transform: rotate(3deg) translateX(1px);
+  }
+  75% {
+    transform: rotate(-2deg);
+  }
+  90% {
+    transform: rotate(1deg);
+  }
+}
+
+/* =========================================================
+   NAV LINKS
+   ========================================================= */
 .nav-links {
   display: flex;
-  list-style: none;
-  gap: 8px;
   align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .nav-links li {
-  list-style: none;
   position: relative;
+  list-style: none;
 }
 
 .nav-links a {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
-  text-decoration: none;
+  padding: 9px 16px;
+  border-radius: 999px;
   color: var(--nav-text);
-  font-weight: 500;
   font-size: 0.95rem;
-  letter-spacing: 0.3px;
-  border-radius: 12px;
-  transition: all 0.25s ease;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+  text-decoration: none;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .nav-links a:hover {
   color: var(--nav-text-hover);
   background: var(--nav-hover-bg);
-  box-shadow: var(--nav-hover-shadow);
   transform: translateY(-1px);
 }
 
-/* ACTIVE LINK */
+.nav-links a.active,
 .nav-links .active {
-  color: #ffffff !important;
-  background: var(--nav-active-bg) !important;
-  font-weight: 600;
-  box-shadow: var(--nav-active-shadow) !important;
+  color: var(--nav-active-text);
+  background: var(--nav-active-bg);
+  font-weight: 700;
+  box-shadow: var(--nav-active-shadow);
 }
 
-/* SEARCH BOX */
+.nav-links a.active:hover,
+.nav-links .active:hover {
+  color: var(--nav-active-text);
+  background: var(--nav-active-bg);
+}
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
 .search-box {
   display: flex;
   align-items: center;
+  gap: 10px;
+  width: 220px;
+  padding: 9px 16px;
   background: var(--search-bg);
   border: 1px solid var(--search-border);
-  padding: 8px 16px;
-  border-radius: 24px;
-  transition: all 0.3s ease;
-  width: 220px;
+  border-radius: 999px;
+  transition: width 0.3s ease, border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
 }
 
 .search-box:hover {
   border-color: var(--search-border-hover);
-  box-shadow: var(--search-hover-shadow);
 }
 
 .search-box:focus-within {
+  width: 270px;
   border-color: var(--search-border-focus);
   background: var(--search-bg-focus);
   box-shadow: var(--search-focus-shadow);
-  width: 260px;
 }
 
 .search-box input {
-  border: none;
-  background: transparent;
-  outline: none;
-  color: var(--search-text);
-  font-size: 0.9rem;
   width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--search-text);
+  font: inherit;
+  font-size: 0.9rem;
 }
 
 .search-box input::placeholder {
@@ -128,28 +285,30 @@ body.page-home {
 .search-box i {
   color: var(--search-icon);
   font-size: 0.9rem;
-  transition: color 0.3s ease, transform 0.3s ease;
+  transition: color 0.25s ease, transform 0.25s ease;
 }
 
 .search-box:focus-within i {
   color: var(--search-icon-focus);
-  transform: scale(1.1);
+  transform: scale(1.15);
 }
 
-/* AUTH SECTION */
+/* =========================================================
+   AUTH BUTTONS
+   ========================================================= */
 .auth-buttons {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .auth-buttons a {
-  text-decoration: none;
-  padding: 8px 18px;
-  border-radius: 12px;
-  font-weight: 600;
+  padding: 9px 20px;
+  border-radius: 999px;
   font-size: 0.9rem;
-  transition: all 0.3s ease;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .auth-buttons a[href="/login"] {
@@ -157,7 +316,6 @@ body.page-home {
 }
 
 .auth-buttons a[href="/login"]:hover {
-  color: var(--login-text-hover);
   background: var(--login-hover-bg);
 }
 
@@ -168,29 +326,30 @@ body.page-home {
 }
 
 .auth-buttons a[href="/signup"]:hover {
-  background: var(--signup-hover-bg);
   box-shadow: var(--signup-hover-shadow);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
-/* USER MENU & DROPDOWN */
+/* =========================================================
+   USER MENU
+   ========================================================= */
 .user-menu {
   position: relative;
 }
 
 .username {
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: var(--nav-text-hover);
-  padding: 8px 16px;
-  border-radius: 12px;
-  background: var(--search-bg);
-  border: 1px solid var(--search-border);
-  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 6px;
+  padding: 8px 16px;
+  background: var(--search-bg);
+  border: 1px solid var(--search-border);
+  border-radius: 999px;
+  color: var(--nav-text-hover);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.25s ease, border-color 0.25s ease;
 }
 
 .username:hover {
@@ -198,28 +357,62 @@ body.page-home {
   border-color: var(--search-border-hover);
 }
 
+/* =========================================================
+   THEME TOGGLE
+   ========================================================= */
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: var(--search-bg);
+  border: 1px solid var(--search-border);
+  border-radius: 50%;
+  color: var(--nav-text-hover);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.3s ease;
+}
+
+.theme-toggle:hover {
+  background: var(--nav-hover-bg);
+  border-color: var(--search-border-hover);
+  transform: rotate(20deg);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   DROPDOWNS
+   ========================================================= */
 .dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 10px);
   right: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 210px;
+  padding: 8px;
+  z-index: 10000;
   background: var(--dropdown-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   border: 1px solid var(--dropdown-border);
   border-radius: 16px;
   box-shadow: var(--dropdown-shadow);
-  display: flex;
-  flex-direction: column;
-  min-width: 200px;
-  padding: 8px;
-  z-index: 10000;
+  transform-origin: top right;
   animation: dropdownFade 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes dropdownFade {
   from {
     opacity: 0;
-    transform: translateY(-8px) scale(0.96);
+    transform: translateY(-8px) scale(0.95);
   }
   to {
     opacity: 1;
@@ -229,20 +422,21 @@ body.page-home {
 
 .dropdown a,
 .dropdown button {
-  padding: 10px 16px;
-  border: none;
-  background: none;
-  text-align: left;
-  cursor: pointer;
-  color: var(--dropdown-text);
-  font-size: 0.9rem;
-  font-weight: 500;
-  border-radius: 10px;
-  transition: all 0.2s ease;
-  text-decoration: none;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  color: var(--dropdown-text);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
 }
 
 .dropdown a:hover,
@@ -252,7 +446,9 @@ body.page-home {
   transform: translateX(3px);
 }
 
-/* CLUB DROPDOWN */
+/* =========================================================
+   CLUBS DROPDOWN
+   ========================================================= */
 .clubs-dropdown {
   position: relative;
 }
@@ -260,20 +456,23 @@ body.page-home {
 .clubs-bar {
   display: none;
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 10px);
   left: 0;
-  background: var(--dropdown-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--dropdown-border);
-  padding: 12px;
-  border-radius: 16px;
-  box-shadow: var(--dropdown-shadow);
-  min-width: 240px;
+  min-width: 250px;
   max-height: 360px;
   overflow-y: auto;
+  padding: 10px;
   z-index: 10000;
+  background: var(--dropdown-bg);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--dropdown-border);
+  border-radius: 16px;
+  box-shadow: var(--dropdown-shadow);
+  transform-origin: top left;
   animation: dropdownFade 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  scrollbar-width: thin;
+  scrollbar-color: var(--search-border-hover) transparent;
 }
 
 .clubs-bar.active {
@@ -281,23 +480,111 @@ body.page-home {
 }
 
 .clubs-bar ul {
-  list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .clubs-bar li {
-  padding: 8px 14px;
-  font-size: 0.88rem;
+  padding: 9px 14px;
+  border-radius: 10px;
   color: var(--dropdown-text);
-  border-radius: 8px;
+  font-size: 0.88rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
 }
 
 .clubs-bar li:hover {
   color: var(--dropdown-text-hover);
   background: var(--dropdown-hover);
   transform: translateX(3px);
-}
+}
+
+/* =========================================================
+   KEYBOARD FOCUS
+   ========================================================= */
+.nav-links a:focus-visible,
+.auth-buttons a:focus-visible,
+.username:focus-visible,
+.dropdown a:focus-visible,
+.dropdown button:focus-visible,
+.clubs-bar li:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width: 1100px) {
+  .search-box {
+    width: 170px;
+  }
+
+  .search-box:focus-within {
+    width: 210px;
+  }
+
+  .nav-links a {
+    padding: 9px 12px;
+  }
+}
+
+@media (max-width: 860px) {
+  .navbar {
+    flex-wrap: wrap;
+    padding: 10px 16px;
+    row-gap: 10px;
+  }
+
+  .nav-links {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+
+  .nav-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-links a {
+    white-space: nowrap;
+  }
+
+  .search-box,
+  .search-box:focus-within {
+    width: 150px;
+  }
+
+  body.page-home {
+    padding-top: 118px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  .dropdown,
+  .clubs-bar,
+  .logo-text:hover {
+    animation: none;
+  }
+
+  .navbar,
+  .nav-links a,
+  .search-box,
+  .auth-buttons a,
+  .username,
+  .theme-toggle,
+  .dropdown a,
+  .dropdown button,
+  .clubs-bar li {
+    transition: none;
+  }
+}
