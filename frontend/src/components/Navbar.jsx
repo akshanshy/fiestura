@@ -134,7 +134,7 @@ export default function Navbar() {
         👤 {user.name} ▼
       </span>
 
-      {/* 🔽 DROPDOWN */}
+      {/*  DROPDOWN */}
       {menuOpen && (
         <div className="dropdown">
 
