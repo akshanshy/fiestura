@@ -264,8 +264,29 @@
     bottom: 12px;
   }
 
-  .ai-chat-panel {
-    width: calc(100vw - 24px);
-    height: min(520px, calc(100dvh - 24px));
-  }
+ 
+.ai-chat-panel {
+  width: 370px;
+  height: 520px;
+
+  min-width: 320px;
+  min-height: 400px;
+
+  max-width: 90vw;
+  max-height: 85vh;
+
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+
+  /* Allow manual resizing */
+  overflow: auto;
+  resize: both;
+}
+
 }
