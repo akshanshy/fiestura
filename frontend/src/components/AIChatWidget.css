@@ -289,7 +289,7 @@
   }
 }
 
-/* Mobile responsive layout */
+/* Mobile responsive layout /
 @media (max-width: 480px) {
   .ai-chat-widget {
     right: 12px;
